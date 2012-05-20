@@ -1,3 +1,9 @@
+== 1.1.0
+
+* Add increase_evaluation and decrease_evaluation methods.
+
+* Fix add_or_update_evaluation bug when using scope.
+
 == 1.0.0
 
 * Open sourced to the world!

@@ -115,6 +115,12 @@ delete_evaluation(reputation_name, source)
 
 # Deletes an evaluation from the reputation with the specified name submitted by specified source. Raises an exception if it does not exist.
 delete_evaluation!(reputation_name, source)
+
+# Increase an evaluation value of the reputation with the specified name by given value.
+increase_evaluation(reputation_name, value, source)
+
+# Decrease an evaluation value of the reputation with the specified name by given value.
+decrease_evaluation(reputation_name, value, source)
 ```
 
 ## Reputation

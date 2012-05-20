@@ -65,6 +65,39 @@ describe ActiveRecord::Base do
       end
     end
 
+    describe "#add_or_update_evaluation" do
+      it "should create evaluation if it does not exist" do
+        @question.add_or_update_evaluation(:total_votes, 1, @user)
+        @question.reputation_value_for(:total_votes).should == 1
+      end
+
+      it "should update evaluation if it exists already" do
+        @question.add_evaluation(:total_votes, 1, @user)
+        @question.add_or_update_evaluation(:total_votes, 2, @user)
+        @question.reputation_value_for(:total_votes).should == 2
+      end
+
+      context "With Scopes" do
+        it "should add evaluation on appropriate scope if it does not exist" do
+          @phrase.add_or_update_evaluation(:difficulty_with_scope, 1, @user, :s1)
+          @phrase.add_or_update_evaluation(:difficulty_with_scope, 2, @user, :s2)
+          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 1
+          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 2
+          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+        end
+
+        it "should update evaluation on appropriate scope if it exists already" do
+          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1)
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2)
+          @phrase.add_or_update_evaluation(:difficulty_with_scope, 3, @user, :s1)
+          @phrase.add_or_update_evaluation(:difficulty_with_scope, 5, @user, :s2)
+          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 3
+          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 5
+          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+        end
+      end
+    end
+
     describe "#update_evaluation" do
       before :each do
         @question.add_evaluation(:total_votes, 1, @user)
@@ -189,6 +222,58 @@ describe ActiveRecord::Base do
 
         it "should raise exception if scope is not given" do
           lambda{@phrase.delete_evaluation(:difficulty_with_scope, @user)}.should raise_error(ArgumentError)
+        end
+      end
+    end
+
+    describe "#increase_evaluation" do
+      it "should add evaluation if it does not exist" do
+        @question.increase_evaluation(:total_votes, 2, @user)
+        @question.reputation_value_for(:total_votes).should == 2
+      end
+
+      it "should increase evaluation if it exists already" do
+        @question.add_evaluation(:total_votes, 1, @user)
+        @question.increase_evaluation(:total_votes, 2, @user)
+        @question.reputation_value_for(:total_votes).should == 3
+      end
+
+      context "With Scopes" do
+        before :each do
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2)
+        end
+
+        it "should increase evaluation on appropriate scope" do
+          @phrase.increase_evaluation(:difficulty_with_scope, 5, @user, :s2)
+          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 0
+          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 7
+          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+        end
+      end
+    end
+
+    describe "#decrease_evaluation" do
+      it "should add evaluation if it does not exist" do
+        @question.decrease_evaluation(:total_votes, 2, @user)
+        @question.reputation_value_for(:total_votes).should == -2
+      end
+
+      it "should increase evaluation if it exists already" do
+        @question.add_evaluation(:total_votes, 1, @user)
+        @question.decrease_evaluation(:total_votes, 2, @user)
+        @question.reputation_value_for(:total_votes).should == -1
+      end
+
+      context "With Scopes" do
+        before :each do
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2)
+        end
+
+        it "should increase evaluation on appropriate scope" do
+          @phrase.decrease_evaluation(:difficulty_with_scope, 5, @user, :s2)
+          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 0
+          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == -3
+          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
         end
       end
     end

@@ -45,7 +45,8 @@ module ReputationSystem
 
     def add_or_update_evaluation(reputation_name, value, source, *args)
       scope = args.first
-      evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(reputation_name, source, self)
+      srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
+      evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(srn, source, self)
       if evaluation.nil?
         self.add_evaluation(reputation_name, value, source, scope)
       else
@@ -84,5 +85,26 @@ module ReputationSystem
         evaluation.destroy
       end
     end
+
+    def increase_evaluation(reputation_name, value, source, *args)
+      change_evaluation_value_by(reputation_name, value, source, *args)
+    end
+
+    def decrease_evaluation(reputation_name, value, source, *args)
+      change_evaluation_value_by(reputation_name, -value, source, *args)
+    end
+
+    protected
+      def change_evaluation_value_by(reputation_name, value, source, *args)
+        scope = args.first
+        srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
+        evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(srn, source, self)
+        if evaluation.nil?
+          self.add_evaluation(reputation_name, value, source, scope)
+        else
+          new_value = evaluation.value + value
+          self.update_evaluation(reputation_name, new_value, source, scope)
+        end
+      end
   end
 end
