@@ -24,7 +24,7 @@ class User < ActiveRecord::Base
       :source => [
           { :reputation => :questioning_skill, :weight => 0.8 },
           { :reputation => :answering_skill }],
-      aggregated_by => :sum
+      :aggregated_by => :sum
 
   has_reputation :questioning_skill,
       :source => { :reputation => :votes, :of => :questions },
