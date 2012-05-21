@@ -10,7 +10,7 @@ In this gem, the reputation system is described as a network of reputations wher
 
 ## Installation
 
-`gem install reputation_system && rails generator reputation_system && rake db:migrate`
+`gem install activerecord-reputation-system && rails generator reputation_system && rake db:migrate`
 
 ## Usage Example
 
