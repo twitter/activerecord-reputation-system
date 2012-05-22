@@ -26,7 +26,6 @@ class RSReputation < ActiveRecord::Base
   attr_accessible :reputation_name, :value, :aggregated_by, :active, :target, :target_id, :target_type, :received_messages
 
   before_save :change_zero_value_in_case_of_product_process
-  before_create
 
   VALID_PROCESSES = ['sum', 'average', 'product']
   validates_inclusion_of :aggregated_by, :in => VALID_PROCESSES, :message => "Value chosen for aggregated_by is not valid process"
@@ -52,7 +51,7 @@ class RSReputation < ActiveRecord::Base
   end
 
   def self.update_reputation_value_with_new_source(rep, source, weight, process)
-    weight = 1 unless weight # weight is 1 by default.
+    weight ||= 1 # weight is 1 by default.
     size = rep.received_messages.size
     valueBeforeUpdate = size > 0 ? rep.value : nil
     newValue = source.value
@@ -72,15 +71,15 @@ class RSReputation < ActiveRecord::Base
   end
 
   def self.update_reputation_value_with_updated_source(rep, source, oldValue, weight, process)
-    weight = 1 unless weight # weight is 1 by default.\
+    weight ||= 1 # weight is 1 by default.
     size = rep.received_messages.size
     valueBeforeUpdate = size > 0 ? rep.value : nil
     newValue = source.value
     case process.to_sym
     when :sum
-      rep.value = rep.value + (newValue - oldValue) * weight
+      rep.value += (newValue - oldValue) * weight
     when :average
-      rep.value = rep.value + ((newValue - oldValue) * weight) / size
+      rep.value += ((newValue - oldValue) * weight) / size
     when :product
       rep.value = (rep.value * newValue) / oldValue
     else
