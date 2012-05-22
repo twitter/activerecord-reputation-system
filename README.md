@@ -10,7 +10,19 @@ In this gem, the reputation system is described as a network of reputations wher
 
 ## Installation
 
-`gem install reputation_system && rails generator reputation_system && rake db:migrate`
+Add to Gemfile:
+
+```ruby
+gem 'activerecord-reputation-system', :require => 'reputation_system'
+```
+
+Run:
+
+```ruby
+bundle install
+rails generator reputation_system
+rake db:migrate
+```
 
 ## Usage Example
 

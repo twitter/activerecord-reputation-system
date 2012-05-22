@@ -36,12 +36,11 @@ class RSEvaluation < ActiveRecord::Base
   end
 
   def self.create_evaluation(reputation_name, value, source, target)
-    reputation_name = reputation_name.to_sym
     RSEvaluation.create!(:reputation_name => reputation_name.to_s, :value => value,
                          :source_id => source.id, :source_type => source.class.name,
                          :target_id => target.id, :target_type => target.class.name)
   end
-   
+
   protected
 
     def source_must_be_defined_for_reputation_in_network
