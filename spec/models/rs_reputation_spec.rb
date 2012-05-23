@@ -41,18 +41,18 @@ describe RSReputation do
     end
 
     it "should be able to create reputation with process 'sum', 'average' and 'product'" do
-      RSReputation.create(:reputation_name => "karma1", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').valid?.should == true
-      RSReputation.create(:reputation_name => "karma2", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'average').valid?.should == true
-      RSReputation.create(:reputation_name => "karma3", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'product').valid?.should == true
+      RSReputation.create(:reputation_name => "karma1", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').should be_valid
+      RSReputation.create(:reputation_name => "karma2", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'average').should be_valid
+      RSReputation.create(:reputation_name => "karma3", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'product').should be_valid
     end
 
     it "should not be able to create reputation with process other than 'sum', 'average' and 'product'" do
-      RSReputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'invalid').valid?.should == false
+      RSReputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'invalid').should_not be_valid
     end
 
     it "should not be able to create reputation of the same name for the same target" do
-      RSReputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').valid?.should == true
-      RSReputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').valid?.should == false
+      RSReputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').should be_valid
+      RSReputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').should_not be_valid
     end
   end
 

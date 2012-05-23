@@ -25,13 +25,13 @@ describe RSReputationMessage do
 
   context "Validation" do
     it "should not be able to create a message from given sender if it has alredy sent one to the same receiver" do
-      RSReputationMessage.create(:sender => @rep1, :receiver => @rep2).valid?.should == true
-      RSReputationMessage.create(:sender => @rep1, :receiver => @rep2).valid?.should == false
+      RSReputationMessage.create(:sender => @rep1, :receiver => @rep2).should be_valid
+      RSReputationMessage.create(:sender => @rep1, :receiver => @rep2).should_not be_valid
     end
 
     it "should have raise error if sender is neither RSEvaluation and RSReputation" do
       RSReputationMessage.create(:sender => @user, :receiver => @rep2).errors[:sender].should_not be_nil
-    end 
+    end
   end
 
   context "Association" do
