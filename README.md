@@ -127,6 +127,10 @@ delete_evaluation(reputation_name, source)
 
 # Deletes an evaluation from the reputation with the specified name submitted by specified source. Raises an exception if it does not exist.
 delete_evaluation!(reputation_name, source)
+
+# Checks if object has an evaluation submitted by specified source.
+has_evaluation?(reputation_name, source)
+
 ```
 
 ## Reputation
@@ -228,6 +232,11 @@ Question.has_scopes?(:difficulty)
 has_scope?(reputation_name, scope)
 # For example:
 Question.has_scope?(:difficulty, :country1)
+
+# Checks if a scoped evaluation has been submitted by specified source.
+has_scoped_evaluation?(:reputation_name, :scope, source)
+# For example:
+Question.has_scoped_evaluation?(:difficulty, :country1, current_user)
 ```
 
 ### Performance
