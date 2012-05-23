@@ -48,11 +48,11 @@ describe ActiveRecord::Base do
 
       it "should delete reputations if target is deleted" do
         @question.add_evaluation(:total_votes, 5, @user)
-        count = RSReputation.count
-        count = RSReputationMessage.count
+        reputation_count = RSReputation.count
+        message_count = RSReputationMessage.count
         @question.destroy
-        RSReputation.count.should < count
-        RSReputationMessage.count.should < count
+        RSReputation.count.should < reputation_count
+        RSReputationMessage.count.should < message_count
       end
 
       it "should have declared default value if any" do
