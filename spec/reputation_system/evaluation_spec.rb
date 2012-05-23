@@ -60,7 +60,7 @@ describe ActiveRecord::Base do
         end
 
         it "should raise exception if scope is not given" do
-          lambda{@phrase.add_evaluation(:difficulty_with_scope, 1, :invalid_scope)}.should raise_error(ArgumentError)
+          lambda{@phrase.add_evaluation(:difficulty_with_scope, 1)}.should raise_error(ArgumentError)
         end
       end
     end
