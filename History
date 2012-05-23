@@ -4,6 +4,8 @@
 
 * Fix add_or_update_evaluation bug when using scope.
 
+* Fix README bugs.
+
 == 1.0.0
 
 * Open sourced to the world!
