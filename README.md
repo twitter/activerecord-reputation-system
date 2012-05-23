@@ -20,7 +20,7 @@ Run:
 
 ```ruby
 bundle install
-rails generator reputation_system
+rails generate reputation_system
 rake db:migrate
 ```
 
@@ -157,12 +157,12 @@ reputations_activated?(reputation_name)
 # Includes the specified reputation value for the given name via a normal Active Record find query.
 ActiveRecord::Base.find_with_reputation(reputation_name, find_scope, options)
 # For example:
-ActiveRecord::Base.find_with_reputation(:maturity, :all, {:select => "id", :conditions => ["maturity > ?", 3], :order => "maturity"})
+User.find_with_reputation(:maturity, :all, {:select => "id", :conditions => ["maturity > ?", 3], :order => "maturity"})
 
 # Includes the specified normalized reputation value for the given name via a normal Active Record find query.
 ActiveRecord::Base.find_with_normalized_reputation(reputation_name, find_options)
 # For example:
-ActiveRecord::Base.find_with_normalized_reputation(:maturity, :all, {:select => "id", :conditions => ["maturity > ?", 3], :order => "maturity"})
+User.find_with_normalized_reputation(:maturity, :all, {:select => "id", :conditions => ["maturity > ?", 3], :order => "maturity"})
 
 # Includes the specified reputation value for the given name via a normal Active Record count query.
 ActiveRecord::Base.count_with_reputation(reputation_name, find_options)
@@ -179,17 +179,21 @@ For example, let's say `question` has a reputation called `difficulty`.  You mig
 
 Scopes can be defined like this:
 ```ruby
-has_reputation :name,
+has_reputation :difficulty,
     ...
-    :scopes => [:scope1, :scope2, ...]
+    :scopes => [:country1, :country2, ...]
 ```
 Once scopes are defined, evaluations can be added in the context of defined scopes:
 ```ruby
-add_evaluation(:reputation_name, :scope)
+add_evaluation(:reputation_name, value, source, :scope)
+# For example:
+@question.add_evaluation(:difficulty, 1, @user, :country2)
 ```
 Also, reputations can be accessed in the context of scopes:
 ```ruby
 reputation_value_for(:reputation_name, :scope)
+# For example:
+@question.reputation_value_for(:difficulty, :country2)
 ```
 To use a scoped reputation as a source in another reputation, try this:
 ```ruby
@@ -204,17 +208,26 @@ has_reputation :rep2,
 To execute an Active Record query using a scoped reputation, try this:
 ```ruby
 ActiveRecord::Base.find_with_reputation(:reputation_name, :scope, :find_options)
+# For example:
+Question.find_with_reputation(:difficulty, :country1, :all, {:select => "id", :conditions => ["maturity > ?", 3], :order => "maturity"})
+
 ```
 There are a few more helper methods available for scopes:
 ```ruby
 # Allows you to add a scope dynamically.
 add_scope_for(reputation_name, scope)
+# For example:
+Question.add_scope_for(:difficulty, :country3)
 
 # Returns true if the reputation has scopes.
 has_scopes?(reputation_name)
+# For example:
+Question.has_scopes?(:difficulty)
 
 # Returns true if the reputation has a given scope.
 has_scope?(reputation_name, scope)
+# For example:
+Question.has_scope?(:difficulty, :country1)
 ```
 
 ### Performance
