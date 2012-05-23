@@ -26,7 +26,7 @@ describe RSEvaluation do
     before :each do
       @attributes = {:reputation_name => 'total_votes', :source => @user, :target => @question, :value => 1}
     end
-    it "should not be able to create an evaluation from given source if it has alredy evaluated the same reputation of the target" do
+    it "should not be able to create an evaluation from given source if it has already evaluated the same reputation of the target" do
       RSEvaluation.create!(@attributes)
       lambda {RSEvaluation.create!(@attributes)}.should raise_error
     end

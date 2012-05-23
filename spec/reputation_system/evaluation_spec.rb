@@ -295,7 +295,7 @@ describe ActiveRecord::Base do
         end
       end
 
-      describe "#update_eavluation" do
+      describe "#update_evaluation" do
         before :each do
           @trans_ja.add_evaluation(:votes, 1, @user)
         end
@@ -307,7 +307,7 @@ describe ActiveRecord::Base do
         end
       end
 
-      describe "#delete_eavluation" do
+      describe "#delete_evaluation" do
         before :each do
           @trans_ja.add_evaluation(:votes, 1, @user)
         end
@@ -343,7 +343,7 @@ describe ActiveRecord::Base do
         end
       end
 
-      describe "#update_eavluation" do
+      describe "#update_evaluation" do
         before :each do
           @trans_ja.add_evaluation(:votes, 1, @user)
           @trans_de.add_evaluation(:votes, 3, @user)
@@ -356,7 +356,7 @@ describe ActiveRecord::Base do
         end
       end
 
-      describe "#delete_eavluation" do
+      describe "#delete_evaluation" do
         before :each do
           @trans_ja.add_evaluation(:votes, 1, @user)
           @trans_de.add_evaluation(:votes, 3, @user)

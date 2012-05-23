@@ -24,7 +24,7 @@ describe RSReputationMessage do
   end
 
   context "Validation" do
-    it "should not be able to create a message from given sender if it has alredy sent one to the same receiver" do
+    it "should not be able to create a message from given sender if it has already sent one to the same receiver" do
       RSReputationMessage.create(:sender => @rep1, :receiver => @rep2).should be_valid
       RSReputationMessage.create(:sender => @rep1, :receiver => @rep2).should_not be_valid
     end
