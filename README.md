@@ -191,7 +191,7 @@ has_reputation :name,
 ```
 Once scopes are defined, evaluations can be added in the context of defined scopes:
 ```ruby
-add_evaluation(:reputation_name, :scope)
+add_evaluation(:reputation_name, evaluation_value, source, :scope)
 ```
 Also, reputations can be accessed in the context of scopes:
 ```ruby
