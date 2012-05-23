@@ -84,5 +84,10 @@ module ReputationSystem
         evaluation.destroy
       end
     end
+    
+    def has_evaluation?(reputation_name, source, *args)
+      srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
+      RSEvaluation.find_by_reputation_name_and_source_and_target(srn, source, self).present?
+    end
   end
 end
