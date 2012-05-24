@@ -234,9 +234,9 @@ has_scope?(reputation_name, scope)
 Question.has_scope?(:difficulty, :country1)
 
 # Checks if a scoped evaluation has been submitted by specified source.
-has_scoped_evaluation?(:reputation_name, :scope, source)
+has_evaluation?(:reputation_name, source, :scope)
 # For example:
-Question.has_scoped_evaluation?(:difficulty, :country1, current_user)
+Question.has_evaluation?(:difficulty, current_user, :country1)
 ```
 
 ### Performance
