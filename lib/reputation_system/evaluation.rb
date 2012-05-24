@@ -86,12 +86,10 @@ module ReputationSystem
     end
     
     def has_evaluation?(reputation_name, source, *args)
-      RSEvaluation.find_by_reputation_name_and_source_and_target(reputation_name, source, self).present?
-    end
-    
-    def has_scoped_evaluation?(reputation_name, scope, source, *args)
+      scope = args.first
       srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
-      RSEvaluation.find_by_reputation_name_and_source_and_target(srn, source, self).present?
+      evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(srn, source, self)
+      evaluation.present?
     end
   end
 end
