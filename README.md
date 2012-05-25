@@ -20,7 +20,7 @@ Run:
 
 ```ruby
 bundle install
-rails generator reputation_system
+rails generate reputation_system
 rake db:migrate
 ```
 
