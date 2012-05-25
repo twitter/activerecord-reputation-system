@@ -23,20 +23,18 @@ module ReputationSystem
       end
 
       def get_reputation_defs(class_name)
-        network[class_name.to_sym] = {} unless network[class_name.to_sym]
-        network[class_name.to_sym]
+        network[class_name.to_sym] ||= {}
       end
 
       def get_reputation_def(class_name, reputation_name)
         reputation_defs = get_reputation_defs(class_name)
-        reputation_defs[reputation_name.to_sym] = {} unless reputation_defs[reputation_name.to_sym]
-        reputation_defs[reputation_name.to_sym]
+        reputation_defs[reputation_name.to_sym] ||= {}
       end
 
       def add_reputation_def(class_name, reputation_name, options)
         reputation_defs = get_reputation_defs(class_name)
         options[:source] = convert_to_array_if_hash(options[:source])
-        options[:source_of] = [] unless options[:source_of]
+        options[:source_of] ||= []
         options[:source_of] = convert_to_array_if_hash(options[:source_of])
         assign_self_as_default_value_for_of_attr(options[:source])
         assign_self_as_default_value_for_of_attr(options[:source_of])
@@ -67,7 +65,7 @@ module ReputationSystem
       def add_scope_for(class_name, reputation_name, scope)
         options = get_reputation_def(class_name, reputation_name)
         if has_scope?(class_name, reputation_name, scope)
-          raise ArgumentError, "#{scope.to_s} is already defined for #{reputation_name.to_s}"
+          raise ArgumentError, "#{scope} is already defined for #{reputation_name}"
         else
           options[:scopes].push scope.to_sym if options[:scopes]
           create_scoped_reputation_def(class_name, reputation_name, scope, options)
@@ -87,7 +85,7 @@ module ReputationSystem
         scope = scope.to_sym if scope
         validate_scope_necessity(class_name, reputation_name, scope)
         validate_scope_existence(class_name, reputation_name, scope)
-        "#{reputation_name.to_s}#{"_#{scope.to_s}" if scope}"
+        "#{reputation_name}#{"_#{scope}" if scope}"
       end
 
       def get_weight_of_source_from_reputation_name_of_target(target, source_name, reputation_name)
@@ -106,17 +104,15 @@ module ReputationSystem
       protected
 
         def network
-          @network = {} unless @network
-          @network
+          @network ||= {}
         end
 
         def data_for_derive_later
-          @data_for_derive_later = {} unless @data_for_derive_later
-          @data_for_derive_later
+          @data_for_derive_later ||= {}
         end
 
         def create_scoped_reputation_def(class_name, reputation_name, scope, options)
-          raise ArgumentError, "#{reputation_name.to_s} does not have scope." unless has_scopes?(class_name, reputation_name)
+          raise ArgumentError, "#{reputation_name} does not have scope." unless has_scopes?(class_name, reputation_name)
           scope_options = {}
           reputation_def = get_reputation_def(class_name, reputation_name)
           if is_primary_reputation?(class_name, reputation_name)
@@ -198,12 +194,11 @@ module ReputationSystem
         end
 
         def convert_to_array_if_hash(tar)
-          tar = [tar] if tar.is_a? Hash
-          tar
+          tar.is_a?(Hash) ? [tar] : tar
         end
 
         def assign_self_as_default_value_for_of_attr(tar)
-          tar = tar.each { |s| s[:of] = :self unless s[:of] } if tar.is_a? Array
+          tar.each { |s| s[:of] = :self unless s[:of] } if tar.is_a? Array
         end
 
         def validate_scope_necessity(class_name, reputation_name, scope)
