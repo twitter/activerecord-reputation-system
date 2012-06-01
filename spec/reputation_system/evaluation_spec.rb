@@ -192,6 +192,19 @@ describe ActiveRecord::Base do
         end
       end
     end
+    describe "#evaluation_value" do
+      it "should return evaluation value" do
+        @question.add_evaluation(:total_votes, 1, @user)
+        @question.evaluation_value(:total_votes, @user).should == 1
+      end
+    end
+
+    describe "#has_evaluation?" do
+      it "should return evaluation state" do
+        @question.add_evaluation(:total_votes, 1, @user)
+        @question.has_evaluation?(:total_votes, @user).should be_true
+      end
+    end
   end
 
   context "Non-Primary Reputation with Gathering Aggregation" do
