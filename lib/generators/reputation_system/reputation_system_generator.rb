@@ -30,6 +30,17 @@ class ReputationSystemGenerator < Rails::Generators::Base
   end
 
   def create_migration_files
-    migration_template 'create_reputation_system.rb', 'db/migrate/create_reputation_system.rb'
+    create_migration_file_if_not_exist 'create_reputation_system'
+    create_migration_file_if_not_exist 'add_reputations_index'
+    create_migration_file_if_not_exist 'add_evaluations_index'
+    create_migration_file_if_not_exist 'add_reputation_messages_index'
   end
+
+  private
+
+    def create_migration_file_if_not_exist(file_name)
+      unless self.class.migration_exists?(File.dirname(File.expand_path("db/migrate/#{file_name}")), file_name)
+        migration_template "#{file_name}.rb", "db/migrate/#{file_name}.rb"
+      end
+    end
 end

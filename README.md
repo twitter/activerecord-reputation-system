@@ -24,6 +24,8 @@ rails generate reputation_system
 rake db:migrate
 ```
 
+* Please do the installation on every upgrade as it may include new migration files.
+
 ## Usage Example
 
 Let's say we want to keep track of user karma in Q&A site where user karma is sum of questioning skill and answering skill. Questioning skill is sum of votes for user's questions and Answering skill is sum of average rating of user's answers. This can be defined as follow:
