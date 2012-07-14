@@ -20,6 +20,6 @@ class AddReputationsIndex < ActiveRecord::Migration
   end
 
   def self.down
-    remove_index :rs_reputations, :column => [:reputation_name, :target_id, :target_type]
+    remove_index :rs_reputations, :name => "index_rs_reputations_on_reputation_name_and_target"
   end
 end
