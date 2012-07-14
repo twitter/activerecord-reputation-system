@@ -1,3 +1,7 @@
+== 1.2.1
+
+* Fix index names to be able to db:rollback the migrations.
+
 == 1.2.0
 
 * Fix race conditions with uniqueness validations.
