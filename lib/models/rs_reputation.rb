@@ -125,29 +125,34 @@ class RSReputation < ActiveRecord::Base
 
     # Propagates updated reputation value to the reputations whose source is the updated reputation.
     def self.propagate_updated_reputation_value(sender, oldValue)
-      sender_name = sender.reputation_name.to_sym
-      receiver_defs = ReputationSystem::Network.get_reputation_def(sender.target.class.name, sender_name)[:source_of]
-      if receiver_defs
-        receiver_defs.each do |rd|
-          receiver_targets = sender.target.get_attributes_of(rd)
-          receiver_targets.each do |rt|
-            scope = sender.target.evaluate_reputation_scope(rd[:scope])
-            srn = ReputationSystem::Network.get_scoped_reputation_name(rt.class.name, rd[:reputation], scope)
-            process = ReputationSystem::Network.get_reputation_def(rt.class.name, srn)[:aggregated_by]
-            rep = find_by_reputation_name_and_target(srn, rt)
-            if rep
-              weight = ReputationSystem::Network.get_weight_of_source_from_reputation_name_of_target(rt, sender_name, srn)
-              unless oldValue
-                update_reputation_value_with_new_source(rep, sender, weight, process)
-              else
-                update_reputation_value_with_updated_source(rep, sender, oldValue, weight, process)
-              end
-            # If r is new then value update will be done when it is initialized.
-            else
-              create_reputation(srn, rt, process)
-            end
-          end
+      receiver_defs = ReputationSystem::Network.get_reputation_def(sender.target.class.name, sender.reputation_name)[:source_of]
+      receiver_defs.each do |rd|
+        targets = sender.target.get_attributes_of(rd)
+        targets.each do |target|
+          scope = sender.target.evaluate_reputation_scope(rd[:scope])
+          send_reputation_message_to_receiver(rd[:reputation], sender, target, scope, oldValue)
         end
+      end if receiver_defs
+    end
+
+    def self.send_reputation_message_to_receiver(reputation_name, sender, target, scope, oldValue)
+      srn = ReputationSystem::Network.get_scoped_reputation_name(target.class.name, reputation_name, scope)
+      process = ReputationSystem::Network.get_reputation_def(target.class.name, srn)[:aggregated_by]
+      receiver = find_by_reputation_name_and_target(srn, target)
+      if receiver
+        weight = ReputationSystem::Network.get_weight_of_source_from_reputation_name_of_target(target, sender.reputation_name, srn)
+        update_reputation_value(receiver, sender, weight, process, oldValue)
+      # If r is new then value update will be done when it is initialized.
+      else
+        create_reputation(srn, target, process)
+      end
+    end
+
+    def self.update_reputation_value(receiver, sender, weight, process, oldValue)
+      unless oldValue
+        update_reputation_value_with_new_source(receiver, sender, weight, process)
+      else
+        update_reputation_value_with_updated_source(receiver, sender, oldValue, weight, process)
       end
     end
 

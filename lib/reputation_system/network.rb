@@ -95,11 +95,13 @@ module ReputationSystem
           source.each do |s|
             scope = target.evaluate_reputation_scope(s[:scope]) if s[:scope]
             of = target.get_attributes_of(s)
-            srn = get_scoped_reputation_name((of.is_a?(Array) ? of[0] : of ).class.name, s[:reputation], scope)
-            source = s if srn.to_sym == source_name.to_sym
+            class_name = (of.is_a?(Array) ? of[0] : of).class.name
+            srn = get_scoped_reputation_name(class_name, s[:reputation], scope)
+            return s[:weight] if srn.to_sym == source_name.to_sym
           end
+        else
+          source[:weight]
         end
-        source[:weight]
       end
 
       protected
@@ -120,19 +122,11 @@ module ReputationSystem
             scope_options[:source] = options[:source]
           else
             scope_options[:source] = []
-            reputation_def[:source].each do |s|
-              rep = {}
-              rep[:reputation] = s[:reputation]
-              # Passing "this" is not pretty but in some case "instance_exec" method
-              # does not give right context for some reason.
-              # This could be ruby bug. Needs further investigation.
-              rep[:of] = lambda { |this| instance_exec(this, scope.to_s, &s[:of]) } if s[:of].is_a? Proc
-              scope_options[:source].push rep
-            end
+            reputation_def[:source].each { |sd| scope_options[:source].push create_source_reputation_def(sd, scope) }
           end
           source_of = reputation_def[:source_of]
           source_of.each do |so|
-            if so[:defined_for_scope].nil? || (so[:defined_for_scope] && so[:defined_for_scope].include?(scope.to_sym))
+            if source_of_defined_for_scope?(so, scope)
               scope_options[:source_of] ||= []
               scope_options[:source_of].push so
             end
@@ -140,6 +134,21 @@ module ReputationSystem
           scope_options[:aggregated_by] = options[:aggregated_by]
           srn = get_scoped_reputation_name(class_name, reputation_name, scope)
           network[class_name.to_sym][srn.to_sym] = scope_options
+        end
+
+        def create_source_reputation_def(source_def, scope)
+          rep = {}
+          rep[:reputation] = source_def[:reputation]
+          # Passing "this" is not pretty but in some case "instance_exec" method
+          # does not give right context for some reason.
+          # This could be ruby bug. Needs further investigation.
+          rep[:of] = lambda { |this| instance_exec(this, scope.to_s, &source_def[:of]) } if source_def[:of].is_a? Proc
+          rep
+        end
+
+        def source_of_defined_for_scope?(source_of_def, scope)
+          defined_for_scope = source_of_def[:defined_for_scope]
+          defined_for_scope.nil? || (defined_for_scope && defined_for_scope.include?(scope.to_sym))
         end
 
         def construct_scoped_reputation_options(class_name, reputation_name, options)
@@ -150,18 +159,34 @@ module ReputationSystem
         end
 
         def derive_source_of_from_source(class_name, reputation_name, source, src_class_name)
-          if source[:of] && source[:of].is_a?(Symbol) && source[:of] != :self
-            klass = src_class_name.to_s.constantize
-            of_value = class_name.tableize
-            of_value = of_value.chomp('s') unless klass.instance_methods.include?(of_value.to_s) || klass.instance_methods.include?(of_value.to_sym)
-          else
-            of_value = "self"
-          end
+          of_value = derive_of_value(class_name, source[:of], src_class_name)
           reputation_def = get_reputation_def(src_class_name, source[:reputation])
           reputation_def[:source_of] ||= []
-          unless reputation_def[:source_of].any? {|elem| elem[:reputation] == reputation_name.to_sym}
+          unless source_of_include_reputation?(reputation_def[:source_of], reputation_name)
             reputation_def[:source_of] << {:reputation => reputation_name.to_sym, :of => of_value.to_sym}
           end
+        end
+
+        def derive_of_value(class_name, source_of, src_class_name)
+          if not_source_of_self?(source_of)
+            attr = class_name.tableize
+            class_has_attribute?(src_class_name, attr) ? attr :  attr.chomp('s')
+          else
+            "self"
+          end
+        end
+
+        def not_source_of_self?(source_of)
+          source_of && source_of.is_a?(Symbol) && source_of != :self
+        end
+
+        def class_has_attribute?(class_name, attribute)
+          klass = class_name.to_s.constantize
+          klass.instance_methods.include?(attribute.to_s) || klass.instance_methods.include?(attribute.to_sym)
+        end
+
+        def source_of_include_reputation?(source_of, reputation_name)
+          source_of.map { |rep| rep[:reputation] }.include?(reputation_name.to_sym)
         end
 
         def derive_source_of_from_source_later(class_name, reputation_name, source, src_class_name)
