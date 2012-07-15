@@ -65,9 +65,10 @@ class RSReputation < ActiveRecord::Base
     else
       raise ArgumentError, "#{process} process is not supported yet"
     end
-    rep.save!
+    save_succeeded = rep.save
     RSReputationMessage.add_reputation_message_if_not_exist(source, rep)
     propagate_updated_reputation_value(rep, valueBeforeUpdate) if rep.target
+    save_succeeded
   end
 
   def self.update_reputation_value_with_updated_source(rep, source, oldValue, weight, process)
@@ -85,8 +86,9 @@ class RSReputation < ActiveRecord::Base
     else
       raise ArgumentError, "#{process} process is not supported yet"
     end
-    rep.save!
+    save_succeeded = rep.save
     propagate_updated_reputation_value(rep, valueBeforeUpdate) if rep.target
+    save_succeeded
   end
 
   def normalized_value

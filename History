@@ -1,3 +1,5 @@
+ * Make evaluation methods return true on success.
+
 == 1.2.1
 
 * Fix index names to be able to db:rollback the migrations.
