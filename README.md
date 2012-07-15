@@ -268,6 +268,10 @@ For more information on semantic versioning, please visit http://semver.org/.
 * Katsuya Noguchi: http://github.com/katsuyan
 * Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
 
+## Related Links
+
+* RailsCasts: http://railscasts.com/episodes/364-active-record-reputation-system
+
 ## License
 
 Copyright 2012 Twitter, Inc.
