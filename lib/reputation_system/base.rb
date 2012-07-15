@@ -51,7 +51,6 @@ module ReputationSystem
         unless ancestors.include?(ReputationSystem::Reputation)
           has_many :reputations, :as => :target, :class_name => "RSReputation", :dependent => :destroy
           include ReputationSystem::Query
-          include ReputationSystem::Normalization
           include ReputationSystem::Reputation
           include ReputationSystem::Scope
         end

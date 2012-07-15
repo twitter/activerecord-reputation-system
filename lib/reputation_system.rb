@@ -16,7 +16,6 @@
 
 require 'reputation_system/base'
 require 'reputation_system/query'
-require 'reputation_system/normalization'
 require 'reputation_system/evaluation'
 require 'reputation_system/network'
 require 'reputation_system/reputation'
