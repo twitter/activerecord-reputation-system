@@ -93,10 +93,7 @@ module ReputationSystem
         source = get_reputation_def(target.class.name, reputation_name)[:source]
         if source.is_a?(Array)
           source.each do |s|
-            scope = target.evaluate_reputation_scope(s[:scope]) if s[:scope]
-            of = target.get_attributes_of(s)
-            class_name = (of.is_a?(Array) ? of[0] : of).class.name
-            srn = get_scoped_reputation_name(class_name, s[:reputation], scope)
+            srn = get_scoped_reputation_name_from_source_def_and_target(s, target)
             return s[:weight] if srn.to_sym == source_name.to_sym
           end
         else
@@ -116,22 +113,18 @@ module ReputationSystem
 
         def create_scoped_reputation_def(class_name, reputation_name, scope, options)
           raise ArgumentError, "#{reputation_name} does not have scope." unless has_scopes?(class_name, reputation_name)
-          scope_options = {}
+          scope_options = options.select { |k, v| [:source, :aggregated_by].include? k }
           reputation_def = get_reputation_def(class_name, reputation_name)
-          if is_primary_reputation?(class_name, reputation_name)
-            scope_options[:source] = options[:source]
-          else
+          unless is_primary_reputation?(class_name, reputation_name)
             scope_options[:source] = []
             reputation_def[:source].each { |sd| scope_options[:source].push create_source_reputation_def(sd, scope) }
           end
-          source_of = reputation_def[:source_of]
-          source_of.each do |so|
+          (reputation_def[:source_of] || []).each do |so|
             if source_of_defined_for_scope?(so, scope)
               scope_options[:source_of] ||= []
               scope_options[:source_of].push so
             end
-          end if source_of
-          scope_options[:aggregated_by] = options[:aggregated_by]
+          end
           srn = get_scoped_reputation_name(class_name, reputation_name, scope)
           network[class_name.to_sym][srn.to_sym] = scope_options
         end
@@ -144,6 +137,13 @@ module ReputationSystem
           # This could be ruby bug. Needs further investigation.
           rep[:of] = lambda { |this| instance_exec(this, scope.to_s, &source_def[:of]) } if source_def[:of].is_a? Proc
           rep
+        end
+
+        def get_scoped_reputation_name_from_source_def_and_target(source_def, target)
+          scope = target.evaluate_reputation_scope(source_def[:scope]) if source_def[:scope]
+          of = target.get_attributes_of(source_def)
+          class_name = (of.is_a?(Array) ? of[0] : of).class.name
+          get_scoped_reputation_name(class_name, source_def[:reputation], scope)
         end
 
         def source_of_defined_for_scope?(source_of_def, scope)
