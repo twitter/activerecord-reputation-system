@@ -113,7 +113,7 @@ module ReputationSystem
 
         def create_scoped_reputation_def(class_name, reputation_name, scope, options)
           raise ArgumentError, "#{reputation_name} does not have scope." unless has_scopes?(class_name, reputation_name)
-          scope_options = options.select { |k, v| [:source, :aggregated_by].include? k }
+          scope_options = options.reject { |k, v| ![:source, :aggregated_by].include? k }
           reputation_def = get_reputation_def(class_name, reputation_name)
           unless is_primary_reputation?(class_name, reputation_name)
             scope_options[:source] = []
