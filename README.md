@@ -185,7 +185,6 @@ ActiveRecord::Base.find_with_reputation_sql(reputation_name, find_options)
 ActiveRecord::Base.evaluated_by(reputation_name, source)
 # For example:
 Question.evaluated_by(:votes, @user)
-#
 ```
 
 ## Advanced Topics
