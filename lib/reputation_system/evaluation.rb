@@ -16,6 +16,23 @@
 
 module ReputationSystem
   module Evaluation
+    module ClassMethods
+      def evaluated_by(reputation_name, source, *args)
+        scope = args.first
+        srn = ReputationSystem::Network.get_scoped_reputation_name(self.name, reputation_name, scope)
+        source_type = source.class.name
+        options = {}
+        options[:select] ||= sanitize_sql_array(["%s.*", self.table_name])
+        options[:joins] = sanitize_sql_array(["JOIN rs_evaluations ON %s.id = rs_evaluations.target_id AND rs_evaluations.target_type = ? AND rs_evaluations.reputation_name = ? AND rs_evaluations.source_id = ? AND rs_evaluations.source_type = ?", self.name, srn.to_s, source.id, source_type])
+        options[:joins] = sanitize_sql_array([options[:joins], self.table_name])
+        find(:all, options) 
+      end
+    end
+
+    def self.included(klass)
+      klass.extend ClassMethods
+    end
+
     def add_evaluation(reputation_name, value, source, *args)
       scope = args.first
       srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
