@@ -26,6 +26,52 @@ describe ActiveRecord::Base do
   end
 
   context "Primary Reputation" do
+    describe "#evaluated_by" do
+      it "should return an empty array if it is not evaluaated by a given source" do
+        Question.evaluated_by(:total_votes, @user).should == []
+      end
+      
+      it "should return an array of targets evaluated by a given source" do
+        user2 = User.create!(:name => 'katsuya')
+        question2 = Question.create!(:text => 'Question 2', :author_id => @user.id)
+        question3 = Question.create!(:text => 'Question 3', :author_id => @user.id)
+        @question.add_evaluation(:total_votes, 1, @user).should be_true
+        question2.add_evaluation(:total_votes, 2, user2).should be_true
+        question3.add_evaluation(:total_votes, 3, @user).should be_true
+        Question.evaluated_by(:total_votes, @user).should == [@question, question3]
+        Question.evaluated_by(:total_votes, user2).should == [question2]
+      end
+
+      context "With Scopes" do
+        it "should return an array of targets evaluated by a given source on appropriate scope" do
+          user2 = User.create!(:name => 'katsuya')
+          phrase2 = Phrase.create!(:text => "Two")
+          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 3, user2, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 4, user2, :s3).should be_true
+          phrase2.add_evaluation(:difficulty_with_scope, 1, user2, :s1).should be_true
+          phrase2.add_evaluation(:difficulty_with_scope, 2, user2, :s2).should be_true
+          phrase2.add_evaluation(:difficulty_with_scope, 3, @user, :s2).should be_true
+          phrase2.add_evaluation(:difficulty_with_scope, 4, @user, :s3).should be_true
+          Phrase.evaluated_by(:difficulty_with_scope, @user, :s1).should == [@phrase]
+          Phrase.evaluated_by(:difficulty_with_scope, user2, :s1).should == [phrase2]
+          Phrase.evaluated_by(:difficulty_with_scope, @user, :s2).should == [@phrase, phrase2]
+          Phrase.evaluated_by(:difficulty_with_scope, user2, :s2).should == [@phrase, phrase2]
+          Phrase.evaluated_by(:difficulty_with_scope, @user, :s3).should == [phrase2]
+          Phrase.evaluated_by(:difficulty_with_scope, user2, :s3).should == [@phrase]
+        end
+
+        it "should raise exception if invalid scope is given" do
+          lambda{@phrase.add_evaluation(:difficulty_with_scope, 1, :invalid_scope)}.should raise_error(ArgumentError)
+        end
+
+        it "should raise exception if scope is not given" do
+          lambda{@phrase.add_evaluation(:difficulty_with_scope, 1)}.should raise_error(ArgumentError)
+        end
+      end
+    end
+
     describe "#add_evaluation" do
       it "should create evaluation in case of valid input" do
         @question.add_evaluation(:total_votes, 1, @user).should be_true

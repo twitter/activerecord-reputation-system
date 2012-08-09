@@ -165,18 +165,26 @@ reputations_activated?(reputation_name)
 # Includes the specified reputation value for the given name via a normal Active Record find query.
 ActiveRecord::Base.find_with_reputation(reputation_name, find_scope, options)
 # For example:
-ActiveRecord::Base.find_with_reputation(:maturity, :all, {:select => "id", :conditions => ["maturity > ?", 3], :order => "maturity"})
+User.find_with_reputation(:karma, :all, {:select => "id", :conditions => ["karma > ?", 3], :order => "karma"})
 
 # Includes the specified normalized reputation value for the given name via a normal Active Record find query.
 ActiveRecord::Base.find_with_normalized_reputation(reputation_name, find_options)
 # For example:
-ActiveRecord::Base.find_with_normalized_reputation(:maturity, :all, {:select => "id", :conditions => ["maturity > ?", 3], :order => "maturity"})
+User.find_with_normalized_reputation(:karma, :all, {:select => "id", :conditions => ["karma > ?", 0.5], :order => "karma"})
 
 # Includes the specified reputation value for the given name via a normal Active Record count query.
 ActiveRecord::Base.count_with_reputation(reputation_name, find_options)
 
 # This method returns a SQL statement rather than a query result.
 ActiveRecord::Base.find_with_reputation_sql(reputation_name, find_options)
+```
+
+## Querying for Evaluated ActiveRecord
+```ruby
+# Returns all active record instances evaluated by a given source for a given reputation name.
+ActiveRecord::Base.evaluated_by(reputation_name, source)
+# For example:
+Question.evaluated_by(:votes, @user)
 ```
 
 ## Advanced Topics
@@ -212,6 +220,10 @@ has_reputation :rep2,
 To execute an Active Record query using a scoped reputation, try this:
 ```ruby
 ActiveRecord::Base.find_with_reputation(:reputation_name, :scope, :find_options)
+```
+To find active records evaluated by a given source for a scoped reputation, try this:
+```ruby
+ActiveRecord::Base.evaluated_by(:reputation_name, source, :scope)
 ```
 There are a few more helper methods available for scopes:
 ```ruby

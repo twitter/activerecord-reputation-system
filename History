@@ -1,4 +1,8 @@
- * Make evaluation methods return true on success.
+== 1.3.0
+
+* Add evaluated_by method.
+
+* Make evaluation methods return true on success.
 
 == 1.2.1
 
