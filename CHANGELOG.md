@@ -16,13 +16,13 @@
 
 ## ActiveRecordReputationSystem 1.3.0 ##
 
-* Add evaluated_by method.
+* Add `evaluated_by method`.
 
 * Make evaluation methods return true on success.
 
 ## ActiveRecordReputationSystem 1.2.1 ##
 
-* Fix index names to be able to db:rollback the migrations.
+* Fix index names to be able to `db:rollback` the migrations.
 
 ## ActiveRecordReputationSystem 1.2.0 ##
 
@@ -30,9 +30,9 @@
 
 ## ActiveRecordReputationSystem 1.1.0 ##
 
-* Add increase_evaluation and decrease_evaluation methods.
+* Add `increase_evaluation` and `decrease_evaluation` methods.
 
-* Fix add_or_update_evaluation bug when using scope.
+* Fix `add_or_update_evaluation` bug when using scope.
 
 * Fix README bugs.
 
@@ -48,13 +48,13 @@
 
 * Overwrite existing reputation definitions instead of raising exceptions.
 
-* Rename reputation_system to reputation_system_active_record.
+* Rename `reputation_system` to `reputation_system_active_record`.
 
 * Support initial value.
 
-* Support for default source_of attribute.
+* Support for default `source_of` attribute.
 
-* Change gem name from reputation-system to reputation_system.
+* Change gem name from `reputation-system` to `reputation_system`.
 
 * No more active record models export upon reputation system generation.
 
@@ -62,13 +62,13 @@
 
 * Major refactoring.
 
-* Rename normalize to active.
+* Rename `normalize` to `active`.
 
 * Fix Query bug.
 
-* Remove ExternalSource support.
+* Remove `ExternalSource` support.
 
-* Add rank_for method.
+* Add `rank_for` method.
 
 * Add count query interface.
 
@@ -76,7 +76,7 @@
 
 * Organize the gem more nicely.
 
-* Add non strict version of delete evaluation method.
+* Add non strict version of `delete_evaluation` method.
 
 * Fix rails 3.2 issue
 
@@ -102,19 +102,19 @@
 
 * Removing dependencies.
 
-* Fix instance_exec error.
+* Fix `instance_exec` error.
 
 * Add query interface.
 
 * Use transaction for better performance.
 
-* Fix a bug related to add_or_update_evaluation.
+* Fix a bug related to `add_or_update_evaluation`.
 
 * Add normalized reputation value accessor.
 
 * Rename all models for organization and for a patch to deal with bug in class caching.
 
-* Add default value (:self) for :of attributes. Fix scope bug. Add support for non-array :source_of value.
+* Add default value (:self) for `:of` attributes. Fix scope bug. Add support for non-array `:source_of` value.
 
 * Add support for scoping reputations.
 
