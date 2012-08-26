@@ -93,19 +93,19 @@ has_reputation  :name,
         :source_of => [{:reputation => name, :of => attribute}, ...],
         :init_value => initial_value
 ```
-* :name is the name of the reputation.
-* :source is a source of the reputation. If it is primary reputation, it takes a class name as input. If it's a non-primary reputation, it takes one or more source definitions, which consist of:
-** :reputation - name of reputation to be used as a source.
-** :of - attribute name (It also accepts a proc as an argument) of the ActiveRecord model which has the source reputation. (default: :self)
-** :weight (optional) - weight value to be used for aggregation (default: 1).
-* :aggregated_by is a mathematical process to be used to aggregate reputation or evaluation values. The following processes are available (each value is weighted by a predefined weight):
-** average - averages all values received.
-** sum - sums up all the values received.
-** product - multiplies all the values received.
-* :source_of (optional) - just like active record association, you don't need to define this if a name can be derived from class name; otherwise if the reputation is used as a part of a source belonging to other reputations, you must define. It takes one or more source definitions, which consists of:
-** :reputation - name of the reputation to be used as a source.
-** :of - attribute name (It also accepts a proc as an argument) of the ActiveRecord model which has the source reputation. (default: :self)
-* :init_value (optional) - initial reputation value assigned to new reputation. It is 0 for average and sum process and 1 for product by default.
+* `:name` is the name of the reputation.
+* `:source` is a source of the reputation. If it is primary reputation, it takes a class name as input. If it's a non-primary reputation, it takes one or more source definitions, which consist of:
+    * `:reputation` - name of reputation to be used as a source.
+    * `:of` - attribute name (It also accepts a proc as an argument) of the ActiveRecord model which has the source reputation. (default: :self)
+    * `:weight` (optional) - weight value to be used for aggregation (default: 1).
+* `:aggregated\_by` is a mathematical process to be used to aggregate reputation or evaluation values. The following processes are available (each value is weighted by a predefined weight):
+    * average - averages all values received.
+    * sum - sums up all the values received.
+    * product - multiplies all the values received.
+* `:source\_of` (optional) - just like active record association, you don't need to define this if a name can be derived from class name; otherwise if the reputation is used as a part of a source belonging to other reputations, you must define. It takes one or more source definitions, which consists of:
+    * `:reputation` - name of the reputation to be used as a source.
+    * `:of` - attribute name (It also accepts a proc as an argument) of the ActiveRecord model which has the source reputation. (default: :self)
+* `:init\_value` (optional) - initial reputation value assigned to new reputation. It is 0 for average and sum process and 1 for product by default.
 
 ## Evaluation
 ```ruby
