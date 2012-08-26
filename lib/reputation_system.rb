@@ -15,7 +15,9 @@
 ##
 
 require 'reputation_system/base'
-require 'reputation_system/query'
+require 'reputation_system/query_methods'
+require 'reputation_system/finder_methods'
+require 'reputation_system/query_builder'
 require 'reputation_system/evaluation'
 require 'reputation_system/network'
 require 'reputation_system/reputation'

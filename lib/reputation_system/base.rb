@@ -50,7 +50,9 @@ module ReputationSystem
         # If it is first time to be called
         unless ancestors.include?(ReputationSystem::Reputation)
           has_many :reputations, :as => :target, :class_name => "RSReputation", :dependent => :destroy
-          include ReputationSystem::Query
+          include ReputationSystem::QueryBuilder
+          include ReputationSystem::QueryMethods
+          include ReputationSystem::FinderMethods
           include ReputationSystem::Reputation
           include ReputationSystem::Scope
         end
