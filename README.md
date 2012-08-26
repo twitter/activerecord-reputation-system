@@ -2,12 +2,6 @@
 
 The Active Record Reputation System helps you discover more about your application and make better decisions. The Reputation System gem makes it easy to integrate reputation systems into Rails applications, decouple the system from the main application and provide guidelines for good design of reputation systems.
 
-## Concept
-
-In this gem, the reputation system is described as a network of reputations where updates are triggered by evaluations and reputation values are computed and propagated by the network. In this network, reputations with values directly computed from evaluations are called primary reputations and reputations with values indirectly computed from evaluations are called non-primary reputations. The following is an abstract view of a possible Reputation System:
-
-![Alt text](./activerecord-reputation-system/raw/master/abs_rs.png "Abstract view of Reputation System")
-
 ## Installation
 
 Add to Gemfile:
