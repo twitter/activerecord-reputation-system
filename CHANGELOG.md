@@ -1,3 +1,7 @@
+* Add `with_normalized_reputation` and `with_normalized_reputation_only`
+
+* Add `with_reputation` and `with_reputation_only` methods.
+
 ## ActiveRecordReputationSystem 1.3.4 ##
 
 * Fix name of a migration class again.

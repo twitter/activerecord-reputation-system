@@ -35,6 +35,20 @@ module ReputationSystem
         self.select(select).joins(joins)
       end
 
+      def with_normalized_reputation(*args)
+        reputation_name, srn = parse_arel_query_args(args)
+        select = build_select_statement(table_name, reputation_name, nil, srn, true)
+        joins = build_join_statement(table_name, name, srn)
+        self.select(select).joins(joins)
+      end
+
+      def with_normalized_reputation_only(*args)
+        reputation_name, srn = parse_arel_query_args(args)
+        select = build_select_statement_with_reputation_only(table_name, reputation_name, srn, true)
+        joins = build_join_statement(table_name, name, srn)
+        self.select(select).joins(joins)
+      end
+
       protected
 
         def parse_arel_query_args(args)
