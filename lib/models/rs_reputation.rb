@@ -91,6 +91,19 @@ class RSReputation < ActiveRecord::Base
     save_succeeded
   end
 
+  def contribution_value
+    if self.active == 1 || self.active == true
+      total = RSReputation.total(self.reputation_name, self.target_type)
+      if total > 0
+        cumulative_sum / total
+      else
+        1
+      end
+    else
+      0
+    end
+  end
+
   def normalized_value
     if self.active == 1 || self.active == true
       max = RSReputation.max(self.reputation_name, self.target_type)
@@ -164,6 +177,16 @@ class RSReputation < ActiveRecord::Base
         update_reputation_value_with_new_source(receiver, source, sd[:weight], process)
         RSReputationMessage.add_reputation_message_if_not_exist(source, receiver)
       end
+    end
+
+    def cumulative_sum
+      RSReputation.where("value <= ?", value).sum(:value,
+                       :conditions => {:reputation_name => reputation_name.to_s, :target_type => target_type, :active => true })
+    end
+
+    def self.total(reputation_name, target_type)
+      RSReputation.sum(:value,
+                       :conditions => {:reputation_name => reputation_name.to_s, :target_type => target_type, :active => true})
     end
 
     def self.max(reputation_name, target_type)
