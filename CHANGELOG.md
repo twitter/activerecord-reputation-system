@@ -1,3 +1,5 @@
+## ActiveRecordReputationSystem 1.4.0 ##
+
 * Add `with_normalized_reputation` and `with_normalized_reputation_only`
 
 * Add `with_reputation` and `with_reputation_only` methods.

@@ -155,6 +155,20 @@ reputations_activated?(reputation_name)
 ```
 
 ## Querying with Reputation
+
+``` ruby
+# Includes the specified reputation value for the given name.
+ActiveRecord::Base.with_reputation(reputation_name, scope)
+# For example:
+User.with_reputation(:karma).where("karma > ?", 3).order("karma")
+
+# Includes the specified normalized reputation value for the given name.
+ActiveRecord::Base.with_normalized_reputation(reputation, scope)
+# For example:
+User.with_normalized_reputation(:karma).where("karma > ?" > 0.5).order("karma")
+```
+Note: Above query methods does not support calcualtion methods such as count, sum and etc yet.
+
 ```ruby
 # Includes the specified reputation value for the given name via a normal Active Record find query.
 ActiveRecord::Base.find_with_reputation(reputation_name, find_scope, options)
