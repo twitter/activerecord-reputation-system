@@ -23,28 +23,42 @@ module ReputationSystem
     module ClassMethods
       def with_reputation(*args)
         reputation_name, srn = parse_arel_query_args(args)
-        select = build_select_statement(table_name, reputation_name)
+        select = build_select_statement(table_name, reputation_name, name)
         joins = build_join_statement(table_name, name, srn)
         self.select(select).joins(joins)
       end
 
       def with_reputation_only(*args)
         reputation_name, srn = parse_arel_query_args(args)
-        select = build_select_statement_with_reputation_only(table_name, reputation_name)
+        select = build_select_statement_with_reputation_only(table_name, reputation_name, name)
+        joins = build_join_statement(table_name, name, srn)
+        self.select(select).joins(joins)
+      end
+
+      def with_contribution_value(*args)
+        reputation_name, srn = parse_arel_query_args(args)
+        select = build_select_statement(table_name, reputation_name, name, nil, srn, false, true)
+        joins = build_join_statement(table_name, name, srn)
+        self.select(select).joins(joins)
+      end
+
+      def with_contribution_value_only(*args)
+        reputation_name, srn = parse_arel_query_args(args)
+        select = build_select_statement_with_reputation_only(table_name, reputation_name, name, srn, false, true)
         joins = build_join_statement(table_name, name, srn)
         self.select(select).joins(joins)
       end
 
       def with_normalized_reputation(*args)
         reputation_name, srn = parse_arel_query_args(args)
-        select = build_select_statement(table_name, reputation_name, nil, srn, true)
+        select = build_select_statement(table_name, reputation_name, name, nil, srn, true)
         joins = build_join_statement(table_name, name, srn)
         self.select(select).joins(joins)
       end
 
       def with_normalized_reputation_only(*args)
         reputation_name, srn = parse_arel_query_args(args)
-        select = build_select_statement_with_reputation_only(table_name, reputation_name, srn, true)
+        select = build_select_statement_with_reputation_only(table_name, reputation_name, name, srn, true)
         joins = build_join_statement(table_name, name, srn)
         self.select(select).joins(joins)
       end

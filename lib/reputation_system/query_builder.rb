@@ -23,8 +23,9 @@ module ReputationSystem
     module ClassMethods
       DELTA = 0.000001
       REPUTATION_JOIN_STATEMENT = "LEFT JOIN rs_reputations ON %s.id = rs_reputations.target_id AND rs_reputations.target_type = ? AND rs_reputations.reputation_name = ? AND rs_reputations.active = ?"
+      CUMULATIVE_SUM_FRAGMENT = "(SELECT SUM(rs_reputations_cumulative_sum.value) FROM rs_reputations AS rs_reputations_cumulative_sum WHERE rs_reputations_cumulative_sum.value <= rs_reputations.value AND rs_reputations_cumulative_sum.target_type = '%s' AND rs_reputations_cumulative_sum.reputation_name = '%s' AND rs_reputations_cumulative_sum.active = '%s')"
 
-      def build_select_statement(table_name, reputation_name, select=nil, srn=nil, normalize=false)
+      def build_select_statement(table_name, reputation_name, class_name, select=nil, srn=nil, normalize=false, contribution=false)
         select = sanitize_sql_array(["%s.*", table_name]) unless select
         if normalize
           max = RSReputation.max(srn, self.name)
@@ -35,12 +36,15 @@ module ReputationSystem
           else
             sanitize_sql_array(["%s, ((rs_reputations.value - %s) / %s) AS normalized_%s", select, min, range, reputation_name])
           end
+        elsif contribution
+          total = RSReputation.total(srn, self.name)
+          sanitize_sql_array(["%s, (#{CUMULATIVE_SUM_FRAGMENT} / %s) AS contributed_%s", select, class_name.to_s, srn.to_s, 't', total, reputation_name])
         else
           sanitize_sql_array(["%s, COALESCE(rs_reputations.value, 0) AS %s", select, reputation_name])
         end
       end
 
-      def build_select_statement_with_reputation_only(table_name, reputation_name, srn=nil, normalize=false)
+      def build_select_statement_with_reputation_only(table_name, reputation_name, class_name, srn=nil, normalize=false, contribution=false)
         if normalize
           max = RSReputation.max(srn, self.name)
           min = RSReputation.min(srn, self.name)
@@ -50,6 +54,9 @@ module ReputationSystem
           else
             sanitize_sql_array(["((rs_reputations.value - %s) / %s) AS normalized_%s", min, range, reputation_name])
           end
+        elsif contribution
+          total = RSReputation.total(srn, self.name)
+          sanitize_sql_array(["(#{CUMULATIVE_SUM_FRAGMENT} / %s) AS contributed_%s", class_name.to_s, srn.to_s, 't', total, reputation_name])
         else
           sanitize_sql_array(["COALESCE(rs_reputations.value, 0) AS %s", reputation_name])
         end

@@ -98,4 +98,29 @@ describe RSReputation do
       @r4.normalized_value.should be_within(DELTA).of(0)
     end
   end
+
+  describe "#contribution_value" do
+    before :each do
+      @user2 = User.create!(:name => 'dick')
+      @user3 = User.create!(:name => 'foo')
+      @user4 = User.create!(:name => 'bob')
+      question = Question.new(:text => "Does this work?", :author_id => @user.id)
+      @r1 = RSReputation.create!(:reputation_name => "karma", :value => 2, :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum')
+      @r2 = RSReputation.create!(:reputation_name => "karma", :value => 6, :target_id => @user2.id, :target_type => @user2.class.to_s, :aggregated_by => 'sum')
+      @r3 = RSReputation.create!(:reputation_name => "karma", :value => 6, :target_id => @user3.id, :target_type => @user3.class.to_s, :aggregated_by => 'sum')
+      @r4 = RSReputation.create!(:reputation_name => "karma", :value => 10, :target_id => @user4.id, :target_type => @user4.class.to_s, :aggregated_by => 'sum')
+      @r5 = RSReputation.create!(:reputation_name => "karma", :value => 10, :target_id => question.id, :target_type => question.class.to_s, :aggregated_by => 'sum')
+    end
+
+    it "should return correct contribution value" do
+      @r1.contribution_value.should be_within(DELTA).of(2.to_f/24)
+      @r2.contribution_value.should be_within(DELTA).of(14.to_f/24)
+      @r3.contribution_value.should be_within(DELTA).of(14.to_f/24)
+      @r4.contribution_value.should be_within(DELTA).of(1)
+    end
+
+    it "should return 0 if max and min are the same" do
+      @r5.contribution_value.should be_within(DELTA).of(1)
+    end
+  end
 end

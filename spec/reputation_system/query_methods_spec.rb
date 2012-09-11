@@ -127,6 +127,115 @@ describe ActiveRecord::Base do
     end
   end
 
+  describe "#with_contribution_value" do
+    context "Without Scopes" do
+      before :each do
+        @question.add_evaluation(:total_votes, 3, @user)
+      end
+
+      it "should return result with given contribution value" do
+        @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
+        @question2.add_evaluation(:total_votes, 6, @user)
+        res = Question.with_contribution_value(:total_votes)
+        res.should == [@question, @question2]
+        res[0].contributed_total_votes.should be_within(DELTA).of(3.to_f/9)
+        res[1].contributed_total_votes.should be_within(DELTA).of(1)
+      end
+
+      it "should not retain select option" do
+        res = Question.with_contribution_value(:total_votes).select("questions.id")
+        res.should == [@question]
+        res[0].id.should_not be_nil
+        lambda {res[0].text}.should_not raise_error
+      end
+
+      it "should retain conditions option" do
+        @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
+        @question2.add_evaluation(:total_votes, 6, @user)
+        res = Question.with_contribution_value(:total_votes).where("contributed_total_votes > 0.6")
+        res.should == [@question2]
+      end
+
+      it "should retain joins option" do
+        res = Question.with_contribution_value(:total_votes).
+          select("questions.*, users.name AS user_name").
+          joins("JOIN users ON questions.author_id = users.id")
+        res.should == [@question]
+        res[0].user_name.should == @user.name
+      end
+    end
+
+    context "With Scopes" do
+      before :each do
+        @trans_ja = Translation.create!(:text => "Ichi", :user => @user, :locale => "ja", :phrase => @phrase)
+        @trans_ja.add_evaluation(:votes, 3, @user)
+        @trans_fr = Translation.create!(:text => "Ichi", :user => @user, :locale => "fr", :phrase => @phrase)
+        @trans_fr.add_evaluation(:votes, 6, @user)
+      end
+
+      it "should return result with given reputation" do
+        res = Phrase.with_contribution_value(:maturity, :ja)
+        res.should == [@phrase]
+        res[0].contributed_maturity.should be_within(DELTA).of(1)
+      end
+    end
+  end
+
+  describe "#with_contribution_value_only" do
+    context "Without Scopes" do
+      before :each do
+        @question.add_evaluation(:total_votes, 3, @user)
+      end
+
+      it "should return result with given contribution value" do
+        @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
+        @question2.add_evaluation(:total_votes, 6, @user)
+        res = Question.with_contribution_value_only(:total_votes)
+        res.length.should == 2
+        res[0].contributed_total_votes.should be_within(DELTA).of(3.to_f/9)
+        res[1].contributed_total_votes.should be_within(DELTA).of(1)
+      end
+
+      it "should not retain select option" do
+        res = Question.with_contribution_value_only(:total_votes).select("questions.id")
+        res.length.should == 1
+        res[0].id.should_not be_nil
+        lambda {res[0].text}.should raise_error
+      end
+
+      it "should retain conditions option" do
+        @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
+        @question2.add_evaluation(:total_votes, 6, @user)
+        res = Question.with_contribution_value_only(:total_votes).where("contributed_total_votes > 0.6")
+        res.length.should == 1
+        res[0].contributed_total_votes.should > 0.6
+      end
+
+      it "should retain joins option" do
+        res = Question.with_contribution_value_only(:total_votes).
+          select("questions.*, users.name AS user_name").
+          joins("JOIN users ON questions.author_id = users.id")
+        res.length.should == 1
+        res[0].user_name.should == @user.name
+      end
+    end
+
+    context "With Scopes" do
+      before :each do
+        @trans_ja = Translation.create!(:text => "Ichi", :user => @user, :locale => "ja", :phrase => @phrase)
+        @trans_ja.add_evaluation(:votes, 3, @user)
+        @trans_fr = Translation.create!(:text => "Ichi", :user => @user, :locale => "fr", :phrase => @phrase)
+        @trans_fr.add_evaluation(:votes, 6, @user)
+      end
+
+      it "should return result with given reputation" do
+        res = Phrase.with_contribution_value_only(:maturity, :ja)
+        res.length.should == 1
+        res[0].contributed_maturity.should be_within(DELTA).of(1)
+      end
+    end
+  end
+
   describe "#with_normalized_reputation" do
     context "Without Scopes" do
       before :each do

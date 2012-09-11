@@ -24,7 +24,7 @@ module FinderMethods
 
       def find_with_reputation(*args)
         reputation_name, srn, find_scope, options = parse_query_args(*args)
-        options[:select] = build_select_statement(table_name, reputation_name, options[:select])
+        options[:select] = build_select_statement(table_name, reputation_name, name, options[:select])
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(options[:conditions])
         find(find_scope, options)
@@ -40,7 +40,7 @@ module FinderMethods
 
       def find_with_normalized_reputation(*args)
         reputation_name, srn, find_scope, options = parse_query_args(*args)
-        options[:select] = build_select_statement(table_name, reputation_name, options[:select], srn, true)
+        options[:select] = build_select_statement(table_name, reputation_name, name, options[:select], srn, true)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(options[:conditions])
         find(find_scope, options)
@@ -48,7 +48,7 @@ module FinderMethods
 
       def find_with_reputation_sql(*args)
         reputation_name, srn, find_scope, options = parse_query_args(*args)
-        options[:select] = build_select_statement(table_name, reputation_name, options[:select])
+        options[:select] = build_select_statement(table_name, reputation_name, name, options[:select])
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(options[:conditions])
         if respond_to?(:construct_finder_sql, true)

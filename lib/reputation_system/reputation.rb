@@ -24,6 +24,10 @@ module ReputationSystem
       find_reputation(reputation_name, args.first).normalized_value
     end
 
+    def contribution_value_for(reputation_name, *args)
+      find_reputation(reputation_name, args.first).contribution_value
+    end
+
     def activate_all_reputations
       RSReputation.find(:all, :conditions => {:target_id => self.id, :target_type => self.class.name, :active => false}).each do |r|
         r.active = true
