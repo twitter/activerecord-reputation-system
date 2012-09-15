@@ -75,7 +75,7 @@ describe ActiveRecord::Base do
     describe "#add_evaluation" do
       it "should create evaluation in case of valid input" do
         @question.add_evaluation(:total_votes, 1, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == 1
+        @question.reputation_for(:total_votes).should == 1
       end
 
       it "should raise exception if invalid reputation name is given" do
@@ -96,9 +96,9 @@ describe ActiveRecord::Base do
         it "should add evaluation on appropriate scope" do
           @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
           @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
-          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 1
-          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 2
-          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s1).should == 1
+          @phrase.reputation_for(:difficulty_with_scope, :s2).should == 2
+          @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
 
         it "should raise exception if invalid scope is given" do
@@ -114,22 +114,22 @@ describe ActiveRecord::Base do
     describe "#add_or_update_evaluation" do
       it "should create evaluation if it does not exist" do
         @question.add_or_update_evaluation(:total_votes, 1, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == 1
+        @question.reputation_for(:total_votes).should == 1
       end
 
       it "should update evaluation if it exists already" do
         @question.add_evaluation(:total_votes, 1, @user)
         @question.add_or_update_evaluation(:total_votes, 2, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == 2
+        @question.reputation_for(:total_votes).should == 2
       end
 
       context "With Scopes" do
         it "should add evaluation on appropriate scope if it does not exist" do
           @phrase.add_or_update_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
           @phrase.add_or_update_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
-          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 1
-          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 2
-          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s1).should == 1
+          @phrase.reputation_for(:difficulty_with_scope, :s2).should == 2
+          @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
 
         it "should update evaluation on appropriate scope if it exists already" do
@@ -137,9 +137,9 @@ describe ActiveRecord::Base do
           @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
           @phrase.add_or_update_evaluation(:difficulty_with_scope, 3, @user, :s1).should be_true
           @phrase.add_or_update_evaluation(:difficulty_with_scope, 5, @user, :s2).should be_true
-          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 3
-          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 5
-          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s1).should == 3
+          @phrase.reputation_for(:difficulty_with_scope, :s2).should == 5
+          @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
       end
     end
@@ -151,7 +151,7 @@ describe ActiveRecord::Base do
 
       it "should update evaluation in case of valid input" do
         @question.update_evaluation(:total_votes, 2, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == 2
+        @question.reputation_for(:total_votes).should == 2
       end
 
       it "should raise exception if invalid reputation name is given" do
@@ -173,9 +173,9 @@ describe ActiveRecord::Base do
 
         it "should update evaluation on appropriate scope" do
           @phrase.update_evaluation(:difficulty_with_scope, 5, @user, :s2).should be_true
-          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 0
-          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 5
-          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s2).should == 5
+          @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
 
         it "should raise exception if invalid scope is given" do
@@ -195,7 +195,7 @@ describe ActiveRecord::Base do
 
       it "should delete evaluation in case of valid input" do
         @question.delete_evaluation!(:total_votes, @user)
-        @question.reputation_value_for(:total_votes).should == 0
+        @question.reputation_for(:total_votes).should == 0
       end
 
       it "should raise exception if invalid reputation name is given" do
@@ -217,9 +217,9 @@ describe ActiveRecord::Base do
 
         it "should delete evaluation on appropriate scope" do
           @phrase.delete_evaluation!(:difficulty_with_scope, @user, :s2)
-          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 0
-          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 0
-          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s2).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
 
         it "should raise exception if invalid scope is given" do
@@ -239,7 +239,7 @@ describe ActiveRecord::Base do
 
       it "should delete evaluation in case of valid input" do
         @question.delete_evaluation(:total_votes, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == 0
+        @question.reputation_for(:total_votes).should == 0
       end
 
       it "should raise exception if invalid reputation name is given" do
@@ -257,9 +257,9 @@ describe ActiveRecord::Base do
 
         it "should delete evaluation on appropriate scope" do
           @phrase.delete_evaluation(:difficulty_with_scope, @user, :s2).should be_true
-          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 0
-          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 0
-          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s2).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
 
         it "should raise exception if invalid scope is given" do
@@ -275,13 +275,13 @@ describe ActiveRecord::Base do
     describe "#increase_evaluation" do
       it "should add evaluation if it does not exist" do
         @question.increase_evaluation(:total_votes, 2, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == 2
+        @question.reputation_for(:total_votes).should == 2
       end
 
       it "should increase evaluation if it exists already" do
         @question.add_evaluation(:total_votes, 1, @user)
         @question.increase_evaluation(:total_votes, 2, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == 3
+        @question.reputation_for(:total_votes).should == 3
       end
 
       context "With Scopes" do
@@ -291,9 +291,9 @@ describe ActiveRecord::Base do
 
         it "should increase evaluation on appropriate scope" do
           @phrase.increase_evaluation(:difficulty_with_scope, 5, @user, :s2).should be_true
-          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 0
-          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == 7
-          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s2).should == 7
+          @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
       end
     end
@@ -301,13 +301,13 @@ describe ActiveRecord::Base do
     describe "#decrease_evaluation" do
       it "should add evaluation if it does not exist" do
         @question.decrease_evaluation(:total_votes, 2, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == -2
+        @question.reputation_for(:total_votes).should == -2
       end
 
       it "should increase evaluation if it exists already" do
         @question.add_evaluation(:total_votes, 1, @user)
         @question.decrease_evaluation(:total_votes, 2, @user).should be_true
-        @question.reputation_value_for(:total_votes).should == -1
+        @question.reputation_for(:total_votes).should == -1
       end
 
       context "With Scopes" do
@@ -317,9 +317,9 @@ describe ActiveRecord::Base do
 
         it "should decrease evaluation on appropriate scope" do
           @phrase.decrease_evaluation(:difficulty_with_scope, 5, @user, :s2).should be_true
-          @phrase.reputation_value_for(:difficulty_with_scope, :s1).should == 0
-          @phrase.reputation_value_for(:difficulty_with_scope, :s2).should == -3
-          @phrase.reputation_value_for(:difficulty_with_scope, :s3).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
+          @phrase.reputation_for(:difficulty_with_scope, :s2).should == -3
+          @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
       end
     end
@@ -336,8 +336,8 @@ describe ActiveRecord::Base do
         it "should affect only reputations with relevant scope" do
           @trans_ja.add_evaluation(:votes, 1, @user)
           @trans_fr.add_evaluation(:votes, 2, @user)
-          @phrase.reputation_value_for(:maturity, :ja).should == 1
-          @phrase.reputation_value_for(:maturity, :fr).should == 2
+          @phrase.reputation_for(:maturity, :ja).should == 1
+          @phrase.reputation_for(:maturity, :fr).should == 2
         end
       end
 
@@ -348,8 +348,8 @@ describe ActiveRecord::Base do
 
         it "should affect only reputations with relevant scope" do
           @trans_ja.update_evaluation(:votes, 3, @user)
-          @phrase.reputation_value_for(:maturity, :ja).should == 3
-          @phrase.reputation_value_for(:maturity, :fr).should == 0
+          @phrase.reputation_for(:maturity, :ja).should == 3
+          @phrase.reputation_for(:maturity, :fr).should == 0
         end
       end
 
@@ -360,8 +360,8 @@ describe ActiveRecord::Base do
 
         it "should affect only reputations with relevant scope" do
           @trans_ja.delete_evaluation!(:votes, @user)
-          @phrase.reputation_value_for(:maturity, :ja).should == 0
-          @phrase.reputation_value_for(:maturity, :fr).should == 0
+          @phrase.reputation_for(:maturity, :ja).should == 0
+          @phrase.reputation_for(:maturity, :fr).should == 0
         end
       end
     end
@@ -378,14 +378,14 @@ describe ActiveRecord::Base do
       describe "#add_evaluation" do
         it "should affect only reputations with relevant scope" do
           @trans_ja.add_evaluation(:votes, 1, @user)
-          @phrase.reputation_value_for(:maturity_all).should == 1
+          @phrase.reputation_for(:maturity_all).should == 1
           @trans_fr.add_evaluation(:votes, 2, @user)
-          @phrase.reputation_value_for(:maturity_all).should == 3
+          @phrase.reputation_for(:maturity_all).should == 3
           @trans_de.add_evaluation(:votes, 3, @user)
-          @phrase.reputation_value_for(:maturity_all).should == 3
-          @phrase.reputation_value_for(:maturity, :ja).should == 1
-          @phrase.reputation_value_for(:maturity, :fr).should == 2
-          @phrase.reputation_value_for(:maturity, :de).should == 3
+          @phrase.reputation_for(:maturity_all).should == 3
+          @phrase.reputation_for(:maturity, :ja).should == 1
+          @phrase.reputation_for(:maturity, :fr).should == 2
+          @phrase.reputation_for(:maturity, :de).should == 3
         end
       end
 
@@ -398,7 +398,7 @@ describe ActiveRecord::Base do
         it "should affect only reputations with relevant scope" do
           @trans_ja.update_evaluation(:votes, 3, @user)
           @trans_de.update_evaluation(:votes, 2, @user)
-          @phrase.reputation_value_for(:maturity_all).should == 3
+          @phrase.reputation_for(:maturity_all).should == 3
         end
       end
 
@@ -410,9 +410,9 @@ describe ActiveRecord::Base do
 
         it "should affect only reputations with relevant scope" do
           @trans_de.delete_evaluation!(:votes, @user)
-          @phrase.reputation_value_for(:maturity_all).should == 1
+          @phrase.reputation_for(:maturity_all).should == 1
           @trans_ja.delete_evaluation!(:votes, @user)
-          @phrase.reputation_value_for(:maturity_all).should == 0
+          @phrase.reputation_for(:maturity_all).should == 0
         end
       end
     end

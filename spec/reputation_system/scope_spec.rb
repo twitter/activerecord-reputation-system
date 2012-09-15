@@ -29,7 +29,7 @@ describe ActiveRecord::Base do
     it "should add scope if the reputation has scopes defined" do
       Phrase.add_scope_for(:difficulty_with_scope, :s4)
       @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s4)
-      @phrase.reputation_value_for(:difficulty_with_scope, :s4).should == 2
+      @phrase.reputation_for(:difficulty_with_scope, :s4).should == 2
     end
 
     it "should raise exception if the scope already exist" do

@@ -17,10 +17,20 @@
 module ReputationSystem
   module Reputation
     def reputation_value_for(reputation_name, *args)
+      warn "[DEPRECATION] `reputation_value_for` will be deprecated in version 2.0.0. Please use `reputation_for` instead."
+      reputation_for(reputation_name, *args)
+    end
+
+    def reputation_for(reputation_name, *args)
       find_reputation(reputation_name, args.first).value
     end
 
     def normalized_reputation_value_for(reputation_name, *args)
+      warn "[DEPRECATION] `normalized_reputation_value_for` will be deprecated in version 2.0.0. Please use `normalized_reputation_for` instead."
+      normalized_reputation_for(reputation_name, *args)
+    end
+
+    def normalized_reputation_for(reputation_name, *args)
       find_reputation(reputation_name, args.first).normalized_value
     end
 
@@ -45,7 +55,7 @@ module ReputationSystem
 
     def rank_for(reputation_name, *args)
       scope = args.first
-      my_value = self.reputation_value_for(reputation_name, scope)
+      my_value = self.reputation_for(reputation_name, scope)
       self.class.count_with_reputation(reputation_name, scope, :all,
         :conditions => ["rs_reputations.value > ?", my_value]
       ) + 1

@@ -36,14 +36,14 @@ describe ActiveRecord::Base do
         @user.respond_to?(:add_evaluation).should == false
       end
 
-      it "should add 'reputation_value_for' method to a model with reputation" do
-        @user.respond_to?(:reputation_value_for).should == true
-        @question.respond_to?(:reputation_value_for).should == true
+      it "should add 'reputation_for' method to a model with reputation" do
+        @user.respond_to?(:reputation_for).should == true
+        @question.respond_to?(:reputation_for).should == true
       end
 
-      it "should add 'normalized_reputation_value_for' method to a model with reputation" do
-        @user.respond_to?(:normalized_reputation_value_for).should == true
-        @question.respond_to?(:normalized_reputation_value_for).should == true
+      it "should add 'normalized_reputation_for' method to a model with reputation" do
+        @user.respond_to?(:normalized_reputation_for).should == true
+        @question.respond_to?(:normalized_reputation_for).should == true
       end
 
       it "should delete reputations if target is deleted" do
@@ -56,12 +56,12 @@ describe ActiveRecord::Base do
       end
 
       it "should have declared default value if any" do
-        @answer.reputation_value_for(:avg_rating).should == 1
+        @answer.reputation_for(:avg_rating).should == 1
       end
 
       it "should overwrite reputation definitions if the same reputation name is declared" do
         Answer.has_reputation(:avg_rating, :source => :user, :aggregated_by => :average, :init_value => 2)
-        Answer.new.reputation_value_for(:avg_rating).should == 2
+        Answer.new.reputation_for(:avg_rating).should == 2
       end
     end
   end
