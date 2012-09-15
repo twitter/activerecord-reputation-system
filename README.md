@@ -70,9 +70,9 @@ Once reputation system is defined, evaluations for answers and questions can be 
 
 Reputation value can be accessed as follow:
 ```ruby
-@answer.reputation_value_for(:avg_rating)
-@question.reputation_value_for(:votes)
-@user.reputation_value_for(:karma)
+@answer.reptuation_for(:avg_rating)
+@question.reptuation_for(:votes)
+@user.reptuation_for(:karma)
 ```
 
 ## Defining Reputation System
@@ -134,7 +134,7 @@ decrease_evaluation(reputation_name, value, source)
 ## Reputation
 ```ruby
 # Returns the reputation value of the reputation with the given name.
-reputation_value_for(reputation_name)
+reptuation_for(reputation_name)
 
 # Returns the reputation rank of the reputation with the given name.
 rank_for(reputation_name)
@@ -142,7 +142,7 @@ rank_for(reputation_name)
 # Returns the normalized reputation value of the reputation with the given name. The normalization is computed using the following equation (assuming linear distribution):
 # normalized_value = (x - min) / (max - min) if max - min&nbsp;﻿is not 0
 # normalized_value = 1 if max - min is 0
-normalized_reputation_value_for(reputation_name)
+normalized_reptuation_for(reputation_name)
 
 # Activates all reputations in the record. Active reputations are used when computing ranks or normalized reputation values.
 activate_all_reputations
@@ -213,7 +213,7 @@ add_evaluation(:reputation_name, evaluation_value, source, :scope)
 ```
 Also, reputations can be accessed in the context of scopes:
 ```ruby
-reputation_value_for(:reputation_name, :scope)
+reptuation_for(:reputation_name, :scope)
 ```
 To use a scoped reputation as a source in another reputation, try this:
 ```ruby

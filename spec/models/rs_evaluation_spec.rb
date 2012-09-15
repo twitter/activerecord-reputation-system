@@ -32,6 +32,24 @@ describe RSEvaluation do
     end
   end
 
+  context "Callback" do
+    describe "#set_source_type_for_sti" do
+      it "should assign source class name as source type if not STI" do
+        question = Question.create!(:text => 'Does this work?', :author_id => @user.id)
+        question.add_evaluation(:total_votes, 5, @user)
+        evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(:total_votes, @user, question)
+        evaluation.source_type.should == @user.class.name
+      end
+      it "should assign source's ancestors class name where reputation is declared if STI" do
+        designer = Designer.create! :name => 'hiro'
+        programmer = Programmer.create! :name => 'katsuya'
+        programmer.add_evaluation(:leadership, 1, designer)
+        evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(:leadership, designer, programmer)
+        evaluation.source_type.should == Person.name
+      end
+    end
+  end
+
   context "Association" do
     it "should delete associated reputation message" do
       @question.add_evaluation(:total_votes, 5, @user)

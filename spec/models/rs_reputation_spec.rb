@@ -56,6 +56,24 @@ describe RSReputation do
     end
   end
 
+  context "Callback" do
+    describe "#set_target_type_for_sti" do
+      it "should assign target class name as target type if not STI" do
+        question = Question.create!(:text => 'Does this work?', :author_id => @user.id)
+        question.add_evaluation(:total_votes, 5, @user)
+        rep = RSReputation.find_by_reputation_name_and_target(:total_votes, question)
+        rep.target_type.should == question.class.name
+      end
+      it "should assign target's ancestors class name where reputation is declared if STI" do
+        designer = Designer.create! :name => 'hiro'
+        programmer = Programmer.create! :name => 'katsuya'
+        programmer.add_evaluation(:leadership, 1, designer)
+        rep = RSReputation.find_by_reputation_name_and_target(:leadership, programmer)
+        rep.target_type.should == Person.name
+      end
+    end
+  end
+
   context "Association" do
     before :each do
       @question = Question.create!(:text => 'What is Twitter?', :author_id => @user.id)

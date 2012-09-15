@@ -25,6 +25,7 @@ class RSReputation < ActiveRecord::Base
 
   attr_accessible :reputation_name, :value, :aggregated_by, :active, :target, :target_id, :target_type, :received_messages
 
+  before_validation :set_target_type_for_sti
   before_save :change_zero_value_in_case_of_product_process
 
   VALID_PROCESSES = ['sum', 'average', 'product']
@@ -32,7 +33,8 @@ class RSReputation < ActiveRecord::Base
   validates_uniqueness_of :reputation_name, :scope => [:target_id, :target_type]
 
   def self.find_by_reputation_name_and_target(reputation_name, target)
-    RSReputation.find_by_reputation_name_and_target_id_and_target_type(reputation_name.to_s, target.id, target.class.name)
+    target_type = get_target_type_for_sti(target, reputation_name)
+    RSReputation.find_by_reputation_name_and_target_id_and_target_type(reputation_name.to_s, target.id, target_type)
   end
 
   # All external access to reputation should use this since they are created lazily.
@@ -174,6 +176,21 @@ class RSReputation < ActiveRecord::Base
     def self.min(reputation_name, target_type)
       RSReputation.minimum(:value,
                            :conditions => {:reputation_name => reputation_name.to_s, :target_type => target_type, :active => true})
+    end
+
+    def self.get_target_type_for_sti(target, reputation_name)
+      temp = target.class
+      defs = ReputationSystem::Network.get_reputation_defs(temp.name)[reputation_name.to_sym]
+      while temp && temp.name != "ActiveRecord::Base" && defs && defs.empty?
+        temp = temp.superclass
+        defs = ReputationSystem::Network.get_reputation_defs(temp.name)[reputation_name.to_sym]
+      end
+      temp ? temp.name : nil
+    end
+
+    def set_target_type_for_sti
+      temp = self.class.get_target_type_for_sti(target, reputation_name)
+      self.target_type = temp if temp
     end
 
     def change_zero_value_in_case_of_product_process

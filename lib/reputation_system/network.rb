@@ -18,8 +18,8 @@ module ReputationSystem
   class Network
     class << self
       def has_reputation_for?(class_name, reputation_name)
-        reputation_defs = get_reputation_defs(class_name)
-        reputation_defs[reputation_name.to_sym] && reputation_defs[reputation_name.to_sym][:source]
+        reputation_def = get_reputation_def(class_name, reputation_name)
+        !!reputation_def[:source]
       end
 
       def get_reputation_defs(class_name)
@@ -27,8 +27,21 @@ module ReputationSystem
       end
 
       def get_reputation_def(class_name, reputation_name)
-        reputation_defs = get_reputation_defs(class_name)
-        reputation_defs[reputation_name.to_sym] ||= {}
+        reputation_def = {}
+        unless class_name == "ActiveRecord::Base"
+          reputation_defs = get_reputation_defs(class_name)
+          reputation_defs[reputation_name.to_sym] ||= {}
+          reputation_def = reputation_defs[reputation_name.to_sym]
+          if reputation_def == {}
+            begin
+              klass = class_name.constantize.superclass
+              reputation_def = get_reputation_def(klass.name, reputation_name) if klass
+            rescue NameError
+              # Class might have not been initialized yet at this point.
+            end
+          end
+        end
+        reputation_def
       end
 
       def add_reputation_def(class_name, reputation_name, options)

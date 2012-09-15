@@ -1,3 +1,7 @@
+## ActiveRecordReputationSystem 1.5.0 ##
+
+* Add a support for STI.
+
 * Add `reputation_for` and `normalized_reputation_for` methods that are shorten name of `reputation_value_for` and `normalized_reputation_value_for` methods.
 
 ## ActiveRecordReputationSystem 1.4.0 ##
