@@ -1,3 +1,5 @@
+* Add `evaluations` association for all evaluation targets.
+
 * Set `:sum` as default for `aggregated_by` option.
 
 * Rename models - RSReputation to ReputationSystem::Reputation, RSEvaluation to ReputationSystem::Evaluation and RSReputationMessage to ReputationSystem::ReputationMessage

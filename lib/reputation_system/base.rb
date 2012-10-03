@@ -49,7 +49,17 @@ module ReputationSystem
 
         # If it is first time to be called
         unless ancestors.include?(ReputationSystem::ReputationMethods)
-          has_many :reputations, :as => :target, :class_name => "ReputationSystem::Reputation", :dependent => :destroy
+          has_many :reputations, :as => :target, :class_name => "ReputationSystem::Reputation", :dependent => :destroy do
+            def for(reputation_name)
+              self.where(:reputation_name => reputation_name)
+            end
+          end
+          has_many :evaluations, :as => :target, :class_name => "ReputationSystem::Evaluation", :dependent => :destroy do
+            def for(reputation_name)
+              self.where(:reputation_name => reputation_name)
+            end
+          end
+
           include ReputationSystem::QueryBuilder
           include ReputationSystem::QueryMethods
           include ReputationSystem::FinderMethods

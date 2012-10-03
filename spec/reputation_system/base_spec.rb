@@ -65,4 +65,48 @@ describe ActiveRecord::Base do
       end
     end
   end
+
+  context "Association" do
+    describe "#reputations" do
+      it "should define reputations association" do
+        @question.respond_to?(:reputations).should == true
+      end
+      it "should return all reputations for the target" do
+        @question.add_evaluation(:total_votes, 2, @user)
+        @question.add_evaluation(:difficulty, 2, @user)
+        @question.reputations.count.should == 2
+      end
+      describe "#for" do
+        it "should return empty array if there is no reputation for the target" do
+          @question.reputations.for(:total_votes).should == []
+        end
+        it "should return all reputations of the given type for the target" do
+          @question.add_evaluation(:total_votes, 2, @user)
+          @question.add_evaluation(:difficulty, 2, @user)
+          @question.reputations.for(:total_votes).count.should == 1
+        end
+      end
+    end
+
+    describe "#evaluations" do
+      it "should define evaluations association" do
+        @question.respond_to?(:evaluations).should == true
+      end
+      it "should return all evaluations for the target" do
+        @question.add_evaluation(:total_votes, 2, @user)
+        @question.add_evaluation(:difficulty, 2, @user)
+        @question.evaluations.count.should == 2
+      end
+      describe "#for" do
+        it "should return empty array if there is no evaluation for the target" do
+          @question.evaluations.for(:total_votes).should == []
+        end
+        it "should return all evaluations of the given type for the target" do
+          @question.add_evaluation(:total_votes, 2, @user)
+          @question.add_evaluation(:difficulty, 2, @user)
+          @question.evaluations.for(:total_votes).count.should == 1
+        end
+      end
+    end
+  end
 end
