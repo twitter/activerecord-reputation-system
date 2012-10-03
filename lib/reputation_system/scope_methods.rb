@@ -15,7 +15,7 @@
 ##
 
 module ReputationSystem
-  module Scope
+  module ScopeMethods
     def self.included(klass)
       klass.extend ClassMethods
     end

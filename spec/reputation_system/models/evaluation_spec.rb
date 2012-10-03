@@ -16,7 +16,7 @@
 
 require 'spec_helper'
 
-describe RSEvaluation do
+describe ReputationSystem::Evaluation do
   before(:each) do
     @user = User.create!(:name => 'jack')
     @question = Question.create!(:text => 'What is Twitter?', :author_id => @user.id)
@@ -27,8 +27,8 @@ describe RSEvaluation do
       @attributes = {:reputation_name => 'total_votes', :source => @user, :target => @question, :value => 1}
     end
     it "should not be able to create an evaluation from given source if it has already evaluated the same reputation of the target" do
-      RSEvaluation.create!(@attributes)
-      lambda {RSEvaluation.create!(@attributes)}.should raise_error
+      ReputationSystem::Evaluation.create!(@attributes)
+      lambda {ReputationSystem::Evaluation.create!(@attributes)}.should raise_error
     end
   end
 
@@ -37,14 +37,14 @@ describe RSEvaluation do
       it "should assign source class name as source type if not STI" do
         question = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         question.add_evaluation(:total_votes, 5, @user)
-        evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(:total_votes, @user, question)
+        evaluation = ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(:total_votes, @user, question)
         evaluation.source_type.should == @user.class.name
       end
       it "should assign source's ancestors class name where reputation is declared if STI" do
         designer = Designer.create! :name => 'hiro'
         programmer = Programmer.create! :name => 'katsuya'
         programmer.add_evaluation(:leadership, 1, designer)
-        evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(:leadership, designer, programmer)
+        evaluation = ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(:leadership, designer, programmer)
         evaluation.source_type.should == Person.name
       end
     end
@@ -53,10 +53,10 @@ describe RSEvaluation do
   context "Association" do
     it "should delete associated reputation message" do
       @question.add_evaluation(:total_votes, 5, @user)
-      evaluation = RSEvaluation.find_by_reputation_name_and_source_and_target(:total_votes, @user, @question)
-      RSReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name).should_not be_nil
+      evaluation = ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(:total_votes, @user, @question)
+      ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name).should_not be_nil
       @question.delete_evaluation(:total_votes, @user)
-      RSReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name).should be_nil
+      ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name).should be_nil
     end
   end
 end
