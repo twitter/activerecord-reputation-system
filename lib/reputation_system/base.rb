@@ -40,7 +40,7 @@ module ReputationSystem
 
     module ClassMethods
       def has_reputation(reputation_name, options)
-        has_valid_input = reputation_name && options[:aggregated_by] && options[:source]
+        has_valid_input = reputation_name && options[:source]
 
         raise ArgumentError, "has_reputation method received invalid arguments." unless has_valid_input
         # Overwrites reputation if the same reputation name is declared in the same model.

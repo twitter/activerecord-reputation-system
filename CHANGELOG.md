@@ -1,3 +1,7 @@
+* Set `:sum` as default for `aggregated_by` option.
+
+* Rename models - RSReputation to ReputationSystem::Reputation, RSEvaluation to ReputationSystem::Evaluation and RSReputationMessage to ReputationSystem::ReputationMessage
+
 ## ActiveRecordReputationSystem 1.5.0 ##
 
 * Add a support for STI.

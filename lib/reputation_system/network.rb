@@ -49,6 +49,7 @@ module ReputationSystem
         options[:source] = convert_to_array_if_hash(options[:source])
         options[:source_of] ||= []
         options[:source_of] = convert_to_array_if_hash(options[:source_of])
+        options[:aggregated_by] = options[:aggregated_by] || :sum
         assign_self_as_default_value_for_of_attr(options[:source])
         assign_self_as_default_value_for_of_attr(options[:source_of])
         reputation_defs[reputation_name] = options
