@@ -1,3 +1,5 @@
+* Remove reputation_value_for and normalized_reputation_value_for methods.
+
 * Add `evaluations` association for all evaluation targets.
 
 * Set `:sum` as default for `aggregated_by` option.
