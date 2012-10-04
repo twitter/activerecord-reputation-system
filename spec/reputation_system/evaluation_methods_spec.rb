@@ -27,10 +27,10 @@ describe ActiveRecord::Base do
 
   context "Primary Reputation" do
     describe "#evaluated_by" do
-      it "should return an empty array if it is not evaluaated by a given source" do
+      it "should return an empty array if it is not evaluated by a given source" do
         Question.evaluated_by(:total_votes, @user).should == []
       end
-      
+
       it "should return an array of targets evaluated by a given source" do
         user2 = User.create!(:name => 'katsuya')
         question2 = Question.create!(:text => 'Question 2', :author_id => @user.id)
@@ -61,13 +61,34 @@ describe ActiveRecord::Base do
           Phrase.evaluated_by(:difficulty_with_scope, @user, :s3).should == [phrase2]
           Phrase.evaluated_by(:difficulty_with_scope, user2, :s3).should == [@phrase]
         end
+      end
+    end
 
-        it "should raise exception if invalid scope is given" do
-          lambda { @phrase.add_evaluation(:difficulty_with_scope, 1, :invalid_scope) }.should raise_error(ArgumentError)
-        end
+    describe "#evaluators_for" do
+      it "should return an empty array if it is not evaluated for a given reputation" do
+        @question.evaluators_for(:total_votes).should == []
+      end
 
-        it "should raise exception if scope is not given" do
-          lambda { @phrase.add_evaluation(:difficulty_with_scope, 1) }.should raise_error(ArgumentError)
+      it "should return an array of sources evaluated the target" do
+        user2 = User.create!(:name => 'katsuya')
+        question2 = Question.create!(:text => 'Question 2', :author_id => @user.id)
+        @question.add_evaluation(:total_votes, 1, @user).should be_true
+        question2.add_evaluation(:total_votes, 1, @user).should be_true
+        question2.add_evaluation(:total_votes, 2, user2).should be_true
+        @question.evaluators_for(:total_votes).should == [@user]
+        question2.evaluators_for(:total_votes).should == [@user, user2]
+      end
+
+      context "With Scopes" do
+        it "should return an array of targets evaluated by a given source on appropriate scope" do
+          user2 = User.create!(:name => 'katsuya')
+          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 3, user2, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 4, user2, :s3).should be_true
+          @phrase.evaluators_for(:difficulty_with_scope, :s1).should == [@user]
+          @phrase.evaluators_for(:difficulty_with_scope, :s2).should == [@user, user2]
+          @phrase.evaluators_for(:difficulty_with_scope, :s3).should == [user2]
         end
       end
     end
