@@ -81,7 +81,7 @@ Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wi
 
 ## Authors
 
-* (Katsuya Noguchi)[http://github.com/katsuyan] (@kn)[https://twitter.com/kn]
+* [Katsuya Noguchi](http://github.com/katsuyan)([@kn](https://twitter.com/kn))
 * Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
 
 ## Contributors
