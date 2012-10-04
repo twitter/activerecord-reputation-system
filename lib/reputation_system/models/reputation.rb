@@ -181,18 +181,18 @@ module ReputationSystem
       end
 
       def self.get_target_type_for_sti(target, reputation_name)
-        temp = target.class
-        defs = ReputationSystem::Network.get_reputation_defs(temp.name)[reputation_name.to_sym]
-        while temp && temp.name != "ActiveRecord::Base" && defs && defs.empty?
-          temp = temp.superclass
-          defs = ReputationSystem::Network.get_reputation_defs(temp.name)[reputation_name.to_sym]
+        target_class = target.class
+        defs = ReputationSystem::Network.get_reputation_defs(target_class.name)[reputation_name.to_sym]
+        while target_class && target_class.name != "ActiveRecord::Base" && defs && defs.empty?
+          target_class = target_class.superclass
+          defs = ReputationSystem::Network.get_reputation_defs(target_class.name)[reputation_name.to_sym]
         end
-        temp ? temp.name : nil
+        target_class ? target_class.name : nil
       end
 
       def set_target_type_for_sti
-        temp = self.class.get_target_type_for_sti(target, reputation_name)
-        self.target_type = temp if temp
+        sti_target_type = self.class.get_target_type_for_sti(target, reputation_name)
+        self.target_type = sti_target_type if sti_target_type
       end
 
       def change_zero_value_in_case_of_product_process

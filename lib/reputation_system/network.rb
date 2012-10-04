@@ -34,6 +34,7 @@ module ReputationSystem
           reputation_def = reputation_defs[reputation_name.to_sym]
           if reputation_def == {}
             begin
+              # This recursion finds reputation definition in the ancestor in case of STI.
               klass = class_name.constantize.superclass
               reputation_def = get_reputation_def(klass.name, reputation_name) if klass
             rescue NameError

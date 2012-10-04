@@ -191,7 +191,7 @@ class Translation < ActiveRecord::Base
   has_reputation :votes,
     :source => :user,
     :aggregated_by => :sum,
-    :source_of => { :reputation => :maturity, :of => :phrase, :scope => :locale} 
+    :source_of => { :reputation => :maturity, :of => :phrase, :scope => :locale}
 end
 
 class Person < ActiveRecord::Base

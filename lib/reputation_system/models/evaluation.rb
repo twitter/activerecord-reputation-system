@@ -17,6 +17,7 @@
 module ReputationSystem
   class Evaluation < ActiveRecord::Base
     self.table_name = 'rs_evaluations'
+
     belongs_to :source, :polymorphic => true
     belongs_to :target, :polymorphic => true
     has_one :sent_messages, :as => :sender, :class_name => 'ReputationSystem::ReputationMessage', :dependent => :destroy
@@ -51,16 +52,16 @@ module ReputationSystem
 
       def self.get_source_type_for_sti(source, target_type, reputation_name)
         valid_source_type = ReputationSystem::Network.get_reputation_def(target_type, reputation_name)[:source].to_s.camelize
-        temp = source.class
-        while temp && valid_source_type != temp.name && temp.name != "ActiveRecord::Base"
-          temp = temp.superclass
+        source_class = source.class
+        while source_class && valid_source_type != source_class.name && source_class.name != "ActiveRecord::Base"
+          source_class = source_class.superclass
         end
-        temp ? temp.name : nil
+        source_class ? source_class.name : nil
       end
 
       def set_source_type_for_sti
-        temp = self.class.get_source_type_for_sti(source, target_type, reputation_name)
-        self.source_type = temp if temp
+        sti_source_type = self.class.get_source_type_for_sti(source, target_type, reputation_name)
+        self.source_type = sti_source_type if sti_source_type
       end
 
       def source_must_be_defined_for_reputation_in_network
