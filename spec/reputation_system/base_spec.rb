@@ -58,11 +58,6 @@ describe ActiveRecord::Base do
       it "should have declared default value if any" do
         @answer.reputation_for(:avg_rating).should == 1
       end
-
-      it "should overwrite reputation definitions if the same reputation name is declared" do
-        Answer.has_reputation(:avg_rating, :source => :user, :aggregated_by => :average, :init_value => 2)
-        Answer.new.reputation_for(:avg_rating).should == 2
-      end
     end
   end
 

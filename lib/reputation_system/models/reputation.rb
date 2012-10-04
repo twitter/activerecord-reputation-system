@@ -17,6 +17,7 @@
 module ReputationSystem
   class Reputation < ActiveRecord::Base
     self.table_name = 'rs_reputations'
+
     belongs_to :target, :polymorphic => true
     has_many :received_messages, :class_name => 'ReputationSystem::ReputationMessage', :foreign_key => :receiver_id, :dependent => :destroy do
       def from(sender)

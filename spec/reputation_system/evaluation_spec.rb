@@ -63,11 +63,11 @@ describe ActiveRecord::Base do
         end
 
         it "should raise exception if invalid scope is given" do
-          lambda{@phrase.add_evaluation(:difficulty_with_scope, 1, :invalid_scope)}.should raise_error(ArgumentError)
+          lambda { @phrase.add_evaluation(:difficulty_with_scope, 1, :invalid_scope) }.should raise_error(ArgumentError)
         end
 
         it "should raise exception if scope is not given" do
-          lambda{@phrase.add_evaluation(:difficulty_with_scope, 1)}.should raise_error(ArgumentError)
+          lambda { @phrase.add_evaluation(:difficulty_with_scope, 1) }.should raise_error(ArgumentError)
         end
       end
     end
@@ -79,17 +79,22 @@ describe ActiveRecord::Base do
       end
 
       it "should raise exception if invalid reputation name is given" do
-        lambda {@question.add_evaluation(:invalid, 1, @user)}.should raise_error(ArgumentError)
+        lambda { @question.add_evaluation(:invalid, 1, @user) }.should raise_error(ArgumentError)
       end
 
       it "should raise exception if the same source evaluates for the same target more than once" do
         @question.add_evaluation(:total_votes, 1, @user)
-        lambda{@question.add_evaluation(:total_votes, 1, @user)}.should raise_error
+        lambda { @question.add_evaluation(:total_votes, 1, @user) }.should raise_error
       end
 
       it "should not allow the same source to add an evaluation for the same target" do
         @question.add_evaluation(:total_votes, 1, @user)
-        lambda{@question.add_evaluation(:total_votes, 1, @user)}.should raise_error
+        lambda { @question.add_evaluation(:total_votes, 1, @user) }.should raise_error
+      end
+
+      it "should not raise exception if some association has not been initialized along during the propagation of reputation" do
+        answer = Answer.create!
+        lambda { answer.add_evaluation(:avg_rating, 3, @user) }.should_not raise_error
       end
 
       context "With Scopes" do
@@ -102,11 +107,11 @@ describe ActiveRecord::Base do
         end
 
         it "should raise exception if invalid scope is given" do
-          lambda{@phrase.add_evaluation(:difficulty_with_scope, 1, :invalid_scope)}.should raise_error(ArgumentError)
+          lambda { @phrase.add_evaluation(:difficulty_with_scope, 1, :invalid_scope) }.should raise_error(ArgumentError)
         end
 
         it "should raise exception if scope is not given" do
-          lambda{@phrase.add_evaluation(:difficulty_with_scope, 1)}.should raise_error(ArgumentError)
+          lambda { @phrase.add_evaluation(:difficulty_with_scope, 1) }.should raise_error(ArgumentError)
         end
       end
     end
@@ -155,15 +160,15 @@ describe ActiveRecord::Base do
       end
 
       it "should raise exception if invalid reputation name is given" do
-        lambda {@question.update_evaluation(:invalid, 1, @user)}.should raise_error(ArgumentError)
+        lambda { @question.update_evaluation(:invalid, 1, @user) }.should raise_error(ArgumentError)
       end
 
       it "should raise exception if invalid source is given" do
-       lambda {@question.update_evaluation(:total_votes, 1, @answer)}.should raise_error(ArgumentError)
+       lambda { @question.update_evaluation(:total_votes, 1, @answer) }.should raise_error(ArgumentError)
       end
 
       it "should raise exception if evaluation does not exist" do
-        lambda{@answer.update_evaluation(:avg_rating, 1, @user)}.should raise_error
+        lambda { @answer.update_evaluation(:avg_rating, 1, @user) }.should raise_error
       end
 
       context "With Scopes" do
@@ -179,11 +184,11 @@ describe ActiveRecord::Base do
         end
 
         it "should raise exception if invalid scope is given" do
-          lambda{@phrase.update_evaluation(:difficulty_with_scope, 5, @user, :invalid_scope)}.should raise_error(ArgumentError)
+          lambda { @phrase.update_evaluation(:difficulty_with_scope, 5, @user, :invalid_scope) }.should raise_error(ArgumentError)
         end
 
         it "should raise exception if scope is not given" do
-          lambda{@phrase.update_evaluation(:difficulty_with_scope, 5, @user)}.should raise_error(ArgumentError)
+          lambda { @phrase.update_evaluation(:difficulty_with_scope, 5, @user) }.should raise_error(ArgumentError)
         end
       end
     end
@@ -199,15 +204,15 @@ describe ActiveRecord::Base do
       end
 
       it "should raise exception if invalid reputation name is given" do
-        lambda {@question.delete_evaluation!(:invalid, @user)}.should raise_error(ArgumentError)
+        lambda { @question.delete_evaluation!(:invalid, @user) }.should raise_error(ArgumentError)
       end
 
       it "should raise exception if invalid source is given" do
-       lambda {@question.delete_evaluation!(:total_votes, @answer)}.should raise_error(ArgumentError)
+       lambda { @question.delete_evaluation!(:total_votes, @answer) }.should raise_error(ArgumentError)
       end
 
       it "should raise exception if evaluation does not exist" do
-        lambda{@answer.delete_evaluation!(:avg_rating, @user)}.should raise_error
+        lambda { @answer.delete_evaluation!(:avg_rating, @user) }.should raise_error
       end
 
       context "With Scopes" do
@@ -223,11 +228,11 @@ describe ActiveRecord::Base do
         end
 
         it "should raise exception if invalid scope is given" do
-          lambda{@phrase.delete_evaluation!(:difficulty_with_scope, @user, :invalid_scope)}.should raise_error(ArgumentError)
+          lambda { @phrase.delete_evaluation!(:difficulty_with_scope, @user, :invalid_scope) }.should raise_error(ArgumentError)
         end
 
         it "should raise exception if scope is not given" do
-          lambda{@phrase.delete_evaluation!(:difficulty_with_scope, @user)}.should raise_error(ArgumentError)
+          lambda { @phrase.delete_evaluation!(:difficulty_with_scope, @user) }.should raise_error(ArgumentError)
         end
       end
     end
@@ -243,7 +248,7 @@ describe ActiveRecord::Base do
       end
 
       it "should raise exception if invalid reputation name is given" do
-        lambda {@question.delete_evaluation(:invalid, @user)}.should raise_error(ArgumentError)
+        lambda { @question.delete_evaluation(:invalid, @user) }.should raise_error(ArgumentError)
       end
 
       it "should return nil if evaluation does not exist" do
@@ -263,11 +268,11 @@ describe ActiveRecord::Base do
         end
 
         it "should raise exception if invalid scope is given" do
-          lambda{@phrase.delete_evaluation(:difficulty_with_scope, @user, :invalid_scope)}.should raise_error(ArgumentError)
+          lambda { @phrase.delete_evaluation(:difficulty_with_scope, @user, :invalid_scope) }.should raise_error(ArgumentError)
         end
 
         it "should raise exception if scope is not given" do
-          lambda{@phrase.delete_evaluation(:difficulty_with_scope, @user)}.should raise_error(ArgumentError)
+          lambda { @phrase.delete_evaluation(:difficulty_with_scope, @user) }.should raise_error(ArgumentError)
         end
       end
     end

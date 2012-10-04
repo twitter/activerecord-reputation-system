@@ -1,3 +1,5 @@
+* Fix a bug that raises exception when associations related reputation propageted has not been initialized at that time.
+
 * Remove reputation_value_for and normalized_reputation_value_for methods.
 
 * Add `evaluations` association for all evaluation targets.
