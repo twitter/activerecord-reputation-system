@@ -20,7 +20,7 @@ rake db:migrate
 
 * Please do the installation on every upgrade as it may include new migration files.
 
-## Usage Example
+## Quick Start 
 
 Let's say we want to keep track of user karma in Q&A site where user karma is sum of questioning skill and answering skill. Questioning skill is sum of votes for user's questions and Answering skill is sum of average rating of user's answers. This can be defined as follow:
 ```ruby
@@ -79,6 +79,21 @@ Reputation value can be accessed as follow:
 
 Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wiki) for available APIs.
 
+## Authors
+
+* (Katsuya Noguchi)[http://github.com/katsuyan] (@kn)[https://twitter.com/kn]
+* Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
+
+## Contributors
+
+1. [NARKOZ (Nihad Abbasov)](https://github.com/NARKOZ) - 4 commits
+2. [elitheeli (Eli Fox-Epstein)](https://github.com/elitheeli) - 1 commit
+3. [amrnt (Amr Tamimi)](https://github.com/amrnt) - 1 commit
+
+## Related Links
+
+* RailsCasts: http://railscasts.com/episodes/364-active-record-reputation-system
+
 ## Versioning
 
 For transparency and insight into our release cycle, releases will be numbered with the follow format:
@@ -92,21 +107,6 @@ And constructed with the following guidelines:
 * Bug fixes and misc changes bump the patch
 
 For more information on semantic versioning, please visit http://semver.org/.
-
-## Authors
-
-* Katsuya Noguchi: http://github.com/katsuyan
-* Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
-
-## Contributors
-
-1. [NARKOZ (Nihad Abbasov)](https://github.com/NARKOZ) - 4 commits
-2. [elitheeli (Eli Fox-Epstein)](https://github.com/elitheeli) - 1 commit
-3. [amrnt (Amr Tamimi)](https://github.com/amrnt) - 1 commit
-
-## Related Links
-
-* RailsCasts: http://railscasts.com/episodes/364-active-record-reputation-system
 
 ## License
 
