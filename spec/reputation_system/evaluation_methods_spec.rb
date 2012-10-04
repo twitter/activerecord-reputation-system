@@ -26,6 +26,28 @@ describe ActiveRecord::Base do
   end
 
   context "Primary Reputation" do
+    describe "#has_evaluation?" do
+      it "should return false if it has not already been evaluated by a given source" do
+        user = User.create! :name => 'katsuya'
+        @question.add_evaluation(:total_votes, 3, user)
+        @question.has_evaluation?(:total_votes, @user).should be_false
+      end
+      it "should return true if it has been evaluated by a given source" do
+        @question.add_evaluation(:total_votes, 3, @user)
+        @question.has_evaluation?(:total_votes, @user).should be_true
+      end
+      context "With Scopes" do
+        it "should return false if it has not already been evaluated by a given source" do
+          @phrase.add_evaluation(:difficulty_with_scope, 3, @user, :s1)
+          @phrase.has_evaluation?(:difficulty_with_scope, @user, :s2).should be_false
+        end
+        it "should return true if it has been evaluated by a given source" do
+          @phrase.add_evaluation(:difficulty_with_scope, 3, @user, :s1)
+          @phrase.has_evaluation?(:difficulty_with_scope, @user, :s1).should be_true
+        end
+      end
+    end
+
     describe "#evaluated_by" do
       it "should return an empty array if it is not evaluated by a given source" do
         Question.evaluated_by(:total_votes, @user).should == []

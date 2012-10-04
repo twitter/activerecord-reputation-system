@@ -33,6 +33,13 @@ module ReputationSystem
       klass.extend ClassMethods
     end
 
+    def has_evaluation?(reputation_name, source, *args)
+      scope = args.first
+      srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
+      !!ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(srn, source, self)
+    end
+
+
     def evaluators_for(reputation_name, *args)
       scope = args.first
       srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
