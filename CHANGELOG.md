@@ -1,3 +1,5 @@
+* Add auto-require `reputation_system`.
+
 * Add `evaluators_for` method.
 
 * Remove reputation_value_for and normalized_reputation_value_for methods.
