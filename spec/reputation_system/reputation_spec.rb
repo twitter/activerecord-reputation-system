@@ -153,9 +153,9 @@ describe ActiveRecord::Base do
         @question2.add_evaluation(:total_votes, 70, @user)
         @question.add_evaluation(:total_votes, 100, @user)
         @question.deactivate_all_reputations
-        ReputationSystem::Reputation.maximum(:value, :conditions => {:reputation_name => 'total_votes', :active => true}).should == 70
+        RSReputation.maximum(:value, :conditions => {:reputation_name => 'total_votes', :active => true}).should == 70
         @question.activate_all_reputations
-        ReputationSystem::Reputation.maximum(:value, :conditions => {:reputation_name => 'total_votes', :active => true}).should == 100
+        RSReputation.maximum(:value, :conditions => {:reputation_name => 'total_votes', :active => true}).should == 100
       end
     end
   end

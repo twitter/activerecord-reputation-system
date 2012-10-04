@@ -135,6 +135,7 @@ class Question < ActiveRecord::Base
 
   has_reputation :total_votes,
     :source => :user,
+    :aggregated_by => :sum,
     :source_of => { :reputation => :question_karma, :of => :author }
 
   has_reputation :difficulty,
@@ -191,7 +192,7 @@ class Translation < ActiveRecord::Base
   has_reputation :votes,
     :source => :user,
     :aggregated_by => :sum,
-    :source_of => { :reputation => :maturity, :of => :phrase, :scope => :locale}
+    :source_of => { :reputation => :maturity, :of => :phrase, :scope => :locale} 
 end
 
 class Person < ActiveRecord::Base
