@@ -1,3 +1,5 @@
+## ActiveRecordReputationSystem 1.5.1 ##
+
 * Fix a bug that raises exception when associations related reputation propageted has not been initialized at that time.
 
 ## ActiveRecordReputationSystem 1.5.0 ##
