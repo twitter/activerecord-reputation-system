@@ -288,6 +288,12 @@ For more information on semantic versioning, please visit http://semver.org/.
 * Katsuya Noguchi: http://github.com/katsuyan
 * Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
 
+## Contributors
+
+1. [NARKOZ (Nihad Abbasov)](https://github.com/NARKOZ) - 4 commits
+2. [elitheeli (Eli Fox-Epstein)](https://github.com/elitheeli) - 1 commit
+3. [amrnt (Amr Tamimi)](https://github.com/amrnt) - 1 commit
+
 ## Related Links
 
 * RailsCasts: http://railscasts.com/episodes/364-active-record-reputation-system
