@@ -27,8 +27,8 @@ module ReputationSystem
       def build_select_statement(table_name, reputation_name, select=nil, srn=nil, normalize=false)
         select = sanitize_sql_array(["%s.*", table_name]) unless select
         if normalize
-          max = RSReputation.max(srn, self.name)
-          min = RSReputation.min(srn, self.name)
+          max = ReputationSystem::Reputation.max(srn, self.name)
+          min = ReputationSystem::Reputation.min(srn, self.name)
           range = max - min
           if range < DELTA
             sanitize_sql_array(["%s, (0) AS normalized_%s", select, reputation_name])
@@ -42,8 +42,8 @@ module ReputationSystem
 
       def build_select_statement_with_reputation_only(table_name, reputation_name, srn=nil, normalize=false)
         if normalize
-          max = RSReputation.max(srn, self.name)
-          min = RSReputation.min(srn, self.name)
+          max = ReputationSystem::Reputation.max(srn, self.name)
+          min = ReputationSystem::Reputation.min(srn, self.name)
           range = max - min
           if range < DELTA
             sanitize_sql_array(["(0) AS normalized_%s", reputation_name])

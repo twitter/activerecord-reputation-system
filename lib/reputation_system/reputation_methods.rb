@@ -15,19 +15,9 @@
 ##
 
 module ReputationSystem
-  module Reputation
-    def reputation_value_for(reputation_name, *args)
-      warn "[DEPRECATION] `reputation_value_for` will be deprecated in version 2.0.0. Please use `reputation_for` instead."
-      reputation_for(reputation_name, *args)
-    end
-
+  module ReputationMethods
     def reputation_for(reputation_name, *args)
       find_reputation(reputation_name, args.first).value
-    end
-
-    def normalized_reputation_value_for(reputation_name, *args)
-      warn "[DEPRECATION] `normalized_reputation_value_for` will be deprecated in version 2.0.0. Please use `normalized_reputation_for` instead."
-      normalized_reputation_for(reputation_name, *args)
     end
 
     def normalized_reputation_for(reputation_name, *args)
@@ -35,21 +25,21 @@ module ReputationSystem
     end
 
     def activate_all_reputations
-      RSReputation.find(:all, :conditions => {:target_id => self.id, :target_type => self.class.name, :active => false}).each do |r|
+      ReputationSystem::Reputation.find(:all, :conditions => {:target_id => self.id, :target_type => self.class.name, :active => false}).each do |r|
         r.active = true
         r.save!
       end
     end
 
     def deactivate_all_reputations
-      RSReputation.find(:all, :conditions => {:target_id => self.id, :target_type => self.class.name, :active => true}).each do |r|
+      ReputationSystem::Reputation.find(:all, :conditions => {:target_id => self.id, :target_type => self.class.name, :active => true}).each do |r|
         r.active = false
         r.save!
       end
     end
 
     def reputations_activated?(reputation_name)
-      r = RSReputation.find(:first, :conditions => {:reputation_name => reputation_name.to_s, :target_id => self.id, :target_type => self.class.name})
+      r = ReputationSystem::Reputation.find(:first, :conditions => {:reputation_name => reputation_name.to_s, :target_id => self.id, :target_type => self.class.name})
       r ? r.active : false
     end
 
@@ -66,7 +56,7 @@ module ReputationSystem
         raise ArgumentError, "#{reputation_name} is not valid" if !self.class.has_reputation_for?(reputation_name)
         srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
         process = ReputationSystem::Network.get_reputation_def(self.class.name, srn)[:aggregated_by]
-        RSReputation.find_or_create_reputation(srn, self, process)
+        ReputationSystem::Reputation.find_or_create_reputation(srn, self, process)
       end
   end
 end

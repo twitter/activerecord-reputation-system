@@ -40,7 +40,7 @@ module ReputationSystem
 
     module ClassMethods
       def has_reputation(reputation_name, options)
-        has_valid_input = reputation_name && options[:aggregated_by] && options[:source]
+        has_valid_input = reputation_name && options[:source]
 
         raise ArgumentError, "has_reputation method received invalid arguments." unless has_valid_input
         # Overwrites reputation if the same reputation name is declared in the same model.
@@ -48,19 +48,29 @@ module ReputationSystem
         ReputationSystem::Network.remove_reputation_def(name, reputation_name) if has_reputation_for?(reputation_name)
 
         # If it is first time to be called
-        unless ancestors.include?(ReputationSystem::Reputation)
-          has_many :reputations, :as => :target, :class_name => "RSReputation", :dependent => :destroy
+        unless ancestors.include?(ReputationSystem::ReputationMethods)
+          has_many :reputations, :as => :target, :class_name => "ReputationSystem::Reputation", :dependent => :destroy do
+            def for(reputation_name)
+              self.where(:reputation_name => reputation_name)
+            end
+          end
+          has_many :evaluations, :as => :target, :class_name => "ReputationSystem::Evaluation", :dependent => :destroy do
+            def for(reputation_name)
+              self.where(:reputation_name => reputation_name)
+            end
+          end
+
           include ReputationSystem::QueryBuilder
           include ReputationSystem::QueryMethods
           include ReputationSystem::FinderMethods
-          include ReputationSystem::Reputation
-          include ReputationSystem::Scope
+          include ReputationSystem::ReputationMethods
+          include ReputationSystem::ScopeMethods
         end
 
         ReputationSystem::Network.add_reputation_def(name, reputation_name, options)
 
         # evaluation related methods are defined only for primary reputations
-        include ReputationSystem::Evaluation if ReputationSystem::Network.is_primary_reputation?(name, reputation_name) && !ancestors.include?(ReputationSystem::Evaluation)
+        include ReputationSystem::EvaluationMethods if ReputationSystem::Network.is_primary_reputation?(name, reputation_name) && !ancestors.include?(ReputationSystem::EvaluationMethods)
       end
 
       def has_reputation_for?(reputation_name)

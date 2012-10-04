@@ -34,6 +34,7 @@ module ReputationSystem
           reputation_def = reputation_defs[reputation_name.to_sym]
           if reputation_def == {}
             begin
+              # This recursion finds reputation definition in the ancestor in case of STI.
               klass = class_name.constantize.superclass
               reputation_def = get_reputation_def(klass.name, reputation_name) if klass
             rescue NameError
@@ -49,6 +50,7 @@ module ReputationSystem
         options[:source] = convert_to_array_if_hash(options[:source])
         options[:source_of] ||= []
         options[:source_of] = convert_to_array_if_hash(options[:source_of])
+        options[:aggregated_by] = options[:aggregated_by] || :sum
         assign_self_as_default_value_for_of_attr(options[:source])
         assign_self_as_default_value_for_of_attr(options[:source_of])
         reputation_defs[reputation_name] = options

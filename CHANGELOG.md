@@ -1,3 +1,11 @@
+* Remove reputation_value_for and normalized_reputation_value_for methods.
+
+* Add `evaluations` association for all evaluation targets.
+
+* Set `:sum` as default for `aggregated_by` option.
+
+* Rename models - RSReputation to ReputationSystem::Reputation, RSEvaluation to ReputationSystem::Evaluation and RSReputationMessage to ReputationSystem::ReputationMessage
+
 ## ActiveRecordReputationSystem 1.5.1 ##
 
 * Fix a bug that raises exception when associations related reputation propageted has not been initialized at that time.
