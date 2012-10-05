@@ -62,7 +62,8 @@ module ReputationSystem
       evaluation.save!
       process = ReputationSystem::Network.get_reputation_def(self.class.name, srn)[:aggregated_by]
       rep = ReputationSystem::Reputation.find_by_reputation_name_and_target(srn, self)
-      ReputationSystem::Reputation.update_reputation_value_with_updated_source(rep, evaluation, oldValue, 1, process)
+      newSize = rep.received_messages.size
+      ReputationSystem::Reputation.update_reputation_value_with_updated_source(rep, evaluation, oldValue, newSize, 1, process)
     end
 
     def add_or_update_evaluation(reputation_name, value, source, *args)
@@ -120,7 +121,8 @@ module ReputationSystem
         oldValue = evaluation.value
         evaluation.value = process == :product ? 1 : 0
         rep = ReputationSystem::Reputation.find_by_reputation_name_and_target(srn, self)
-        ReputationSystem::Reputation.update_reputation_value_with_updated_source(rep, evaluation, oldValue, 1, process)
+        newSize = rep.received_messages.size - 1
+        ReputationSystem::Reputation.update_reputation_value_with_updated_source(rep, evaluation, oldValue, newSize, 1, process)
         evaluation.destroy
       end
 
