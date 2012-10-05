@@ -16,7 +16,7 @@
 
 require 'spec_helper'
 
-describe ActiveRecord::Base do
+describe ReputationSystem::ReputationMethods do
 
   before(:each) do
     @user = User.create!(:name => 'jack')
