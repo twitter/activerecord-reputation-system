@@ -1,13 +1,18 @@
 ## ActiveRecord Reputation System  [![Build Status](https://secure.travis-ci.org/twitter/activerecord-reputation-system.png)](http://travis-ci.org/twitter/activerecord-reputation-system) [![Code Climate](https://codeclimate.com/badge.png)](https://codeclimate.com/github/twitter/activerecord-reputation-system)
 
-The Active Record Reputation System helps you discover more about your application and make better decisions. The Reputation System gem makes it easy to integrate reputation systems into Rails applications, decouple the system from the main application and provide guidelines for good design of reputation systems.
+The Active Record Reputation System helps you build the reputation system for your Rails application. It allows Active Record to have reputations and get evaluated by other records. This gem allows you to:
+* define reputations in easily readable way.
+* integrate reputation systems into applications and decouple the system from the main application.
+* discover more about your application and make better decisions.
 
 ## Installation
+
+* If you are updating to version 2 from version older, you should check out [migration guide](https://github.com/twitter/activerecord-reputation-system/wiki/Migrate-to-Version-2.0).
 
 Add to Gemfile:
 
 ```ruby
-gem 'activerecord-reputation-system', :require => 'reputation_system'
+gem 'activerecord-reputation-system'
 ```
 
 Run:
@@ -20,7 +25,7 @@ rake db:migrate
 
 * Please do the installation on every upgrade as it may include new migration files.
 
-## Usage Example
+## Quick Start 
 
 Let's say we want to keep track of user karma in Q&A site where user karma is sum of questioning skill and answering skill. Questioning skill is sum of votes for user's questions and Answering skill is sum of average rating of user's answers. This can be defined as follow:
 ```ruby
@@ -31,16 +36,13 @@ class User < ActiveRecord::Base
   has_reputation :karma,
       :source => [
           { :reputation => :questioning_skill, :weight => 0.8 },
-          { :reputation => :answering_skill }],
-      :aggregated_by => :sum
+          { :reputation => :answering_skill }]
 
   has_reputation :questioning_skill,
-      :source => { :reputation => :votes, :of => :questions },
-      :aggregated_by => :sum
+      :source => { :reputation => :votes, :of => :questions }
 
   has_reputation :answering_skill,
-      :source => { :reputation => :avg_rating, :of => :answers },
-      :aggregated_by => :sum
+      :source => { :reputation => :avg_rating, :of => :answers }
 end
 
 class Answer < ActiveRecord::Base
@@ -57,8 +59,7 @@ class Question < ActiveRecord::Base
   belongs_to :user
 
   has_reputation :votes,
-      :source => :user,
-      :aggregated_by => :sum
+      :source => :user
 end
 ```
 
@@ -70,204 +71,46 @@ Once reputation system is defined, evaluations for answers and questions can be 
 
 Reputation value can be accessed as follow:
 ```ruby
-@answer.reptuation_for(:avg_rating)
-@question.reptuation_for(:votes)
+@answer.reptuation_for(:avg_rating) #=> 3
+@question.reptuation_for(:votes) #=> 1
 @user.reptuation_for(:karma)
 ```
 
-## Defining Reputation System
-
-All reputations can be defined in their target ActiveRecord models like this:
+You can query for records using reputation value:
 ```ruby
-# Primary Reputation
-has_reputation  :name,
-        :source => source,
-        :aggregated_by => process,
-        :source_of => [{:reputation => name, :of => attribute}, ...],
-        :init_value => initial_value
-
-# Non Primary Reputation
-has_reputation  :name,
-        :source => [{:reputation => name, :of => attribute, :weight => weight}, ...],
-        :aggregated_by => process,
-        :source_of => [{:reputation => name, :of => attribute}, ...],
-        :init_value => initial_value
+@user.with_reputation(:karma).where('karma > 10')
 ```
-* `:name` is the name of the reputation.
-* `:source` is a source of the reputation. If it is primary reputation, it takes a class name as input. If it's a non-primary reputation, it takes one or more source definitions, which consist of:
-    * `:reputation` - name of reputation to be used as a source.
-    * `:of` - attribute name (It also accepts a proc as an argument) of the ActiveRecord model which has the source reputation. (default: :self)
-    * `:weight` (optional) - weight value to be used for aggregation (default: 1).
-* `:aggregated_by` is a mathematical process to be used to aggregate reputation or evaluation values. The following processes are available (each value is weighted by a predefined weight):
-    * average - averages all values received.
-    * sum - sums up all the values received.
-    * product - multiplies all the values received.
-* `:source_of` (optional) - just like active record association, you don't need to define this if a name can be derived from class name; otherwise if the reputation is used as a part of a source belonging to other reputations, you must define. It takes one or more source definitions, which consists of:
-    * `:reputation` - name of the reputation to be used as a source.
-    * `:of` - attribute name (It also accepts a proc as an argument) of the ActiveRecord model which has the source reputation. (default: :self)
-* `:init_value` (optional) - initial reputation value assigned to new reputation. It is 0 for average and sum process and 1 for product by default.
 
-## Evaluation
+You can get source records that have evaluated the target record:
 ```ruby
-# Adds an evaluation to the reputation with the specified name.
-add_evaluation(reputation_name, evaluation_value, source)
-
-# Updates an existing evaluation of the reputation with the specified name by the specified source.
-update_evaluation(reputation_name, evaluation_value, source)
-
-# Adds an evaluation to the reputation with the specified name if it exists; otherwise it updates the existing reputation.
-add_or_update_evaluation(reputation_name, evaluation_value, source)
-
-# Deletes an evaluation from the reputation with the specified name submitted by the specified source. It returns nil if it does not exist.
-delete_evaluation(reputation_name, source)
-
-# Deletes an evaluation from the reputation with the specified name submitted by specified source. Raises an exception if it does not exist.
-delete_evaluation!(reputation_name, source)
-
-# Increase an evaluation value of the reputation with the specified name by given value.
-increase_evaluation(reputation_name, value, source)
-
-# Decrease an evaluation value of the reputation with the specified name by given value.
-decrease_evaluation(reputation_name, value, source)
+@question.evaluators_for(:votes) #=> [@user]
 ```
 
-## Reputation
+You can get target records that have been evaluated by a given source record:
 ```ruby
-# Returns the reputation value of the reputation with the given name.
-reptuation_for(reputation_name)
-
-# Returns the reputation rank of the reputation with the given name.
-rank_for(reputation_name)
-
-# Returns the normalized reputation value of the reputation with the given name. The normalization is computed using the following equation (assuming linear distribution):
-# normalized_value = (x - min) / (max - min) if max - min&nbsp;﻿is not 0
-# normalized_value = 1 if max - min is 0
-normalized_reptuation_for(reputation_name)
-
-# Activates all reputations in the record. Active reputations are used when computing ranks or normalized reputation values.
-activate_all_reputations
-
-# Deactivates all reputations in the record. Inactive reputations are not used when computing ranks or normalized reputation values.
-deactivate_all_reputations
-
-# Checks if reputation is active.
-reputations_activated?(reputation_name)
+Question.evaluated_by(:votes, @user) #=> [@question]
 ```
 
-## Querying with Reputation
+## Documentation
 
-``` ruby
-# Includes the specified reputation value for the given name.
-ActiveRecord::Base.with_reputation(reputation_name, scope)
-# For example:
-User.with_reputation(:karma).where("karma > ?", 3).order("karma")
+Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wiki) for available APIs.
 
-# Includes the specified normalized reputation value for the given name.
-ActiveRecord::Base.with_normalized_reputation(reputation, scope)
-# For example:
-User.with_normalized_reputation(:karma).where("karma > ?" > 0.5).order("karma")
-```
-Note: Above query methods does not support calcualtion methods such as count, sum and etc yet.
+## Authors
 
-```ruby
-# Includes the specified reputation value for the given name via a normal Active Record find query.
-ActiveRecord::Base.find_with_reputation(reputation_name, find_scope, options)
-# For example:
-User.find_with_reputation(:karma, :all, {:select => "id", :conditions => ["karma > ?", 3], :order => "karma"})
+Katsuya Noguchi
+* [http://twitter.com/kn](http://twitter.com/kn)
+* [http://github.com/katsuyan](http://github.com/katsuyan)
 
-# Includes the specified normalized reputation value for the given name via a normal Active Record find query.
-ActiveRecord::Base.find_with_normalized_reputation(reputation_name, find_options)
-# For example:
-User.find_with_normalized_reputation(:karma, :all, {:select => "id", :conditions => ["karma > ?", 0.5], :order => "karma"})
+## Contributors
 
-# Includes the specified reputation value for the given name via a normal Active Record count query.
-ActiveRecord::Base.count_with_reputation(reputation_name, find_options)
+1. [NARKOZ (Nihad Abbasov)](https://github.com/NARKOZ) - 4 commits
+2. [elitheeli (Eli Fox-Epstein)](https://github.com/elitheeli) - 1 commit
+3. [amrnt (Amr Tamimi)](https://github.com/amrnt) - 1 commit
 
-# This method returns a SQL statement rather than a query result.
-ActiveRecord::Base.find_with_reputation_sql(reputation_name, find_options)
-```
+## Related Links
 
-## Querying for Evaluated ActiveRecord
-```ruby
-# Returns all active record instances evaluated by a given source for a given reputation name.
-ActiveRecord::Base.evaluated_by(reputation_name, source)
-# For example:
-Question.evaluated_by(:votes, @user)
-```
-
-## Advanced Topics
-### Scope
-Reputations can have different scopes to provide additional context.
-
-For example, let's say `question` has a reputation called `difficulty`.  You might want to keep track of that reputation by country, such that each question has a different difficulty rating in each country.
-
-Scopes can be defined like this:
-```ruby
-has_reputation :name,
-    ...
-    :scopes => [:scope1, :scope2, ...]
-```
-Once scopes are defined, evaluations can be added in the context of defined scopes:
-```ruby
-add_evaluation(:reputation_name, evaluation_value, source, :scope)
-```
-Also, reputations can be accessed in the context of scopes:
-```ruby
-reptuation_for(:reputation_name, :scope)
-```
-To use a scoped reputation as a source in another reputation, try this:
-```ruby
-has_reputation :rep1,
-    :source => {:reputation => :rep2, :scope => :scope1}
-    ...
-has_reputation :rep2,
-    ...
-    :scopes => [:scope1, :scope2, ...],
-    :source_of => {:reputation => :rep1, :defined_for_scope => [:scope1]}
-```
-To execute an Active Record query using a scoped reputation, try this:
-```ruby
-ActiveRecord::Base.find_with_reputation(:reputation_name, :scope, :find_options)
-```
-To find active records evaluated by a given source for a scoped reputation, try this:
-```ruby
-ActiveRecord::Base.evaluated_by(:reputation_name, source, :scope)
-```
-There are a few more helper methods available for scopes:
-```ruby
-# Allows you to add a scope dynamically.
-add_scope_for(reputation_name, scope)
-
-# Returns true if the reputation has scopes.
-has_scopes?(reputation_name)
-
-# Returns true if the reputation has a given scope.
-has_scope?(reputation_name, scope)
-```
-
-### Performance
-
-For applications with large data set, computation of reputation values can be expensive. Therefore, it is common to perform the computation asynchronously (in batch). If you wish to asynchronously compute reputation values, I strongly recommend you to use [collectiveidea's Delayed Job](https://github.com/collectiveidea/delayed_job). For example:
-
-```ruby
-class User < ActiveRecord
-  has_reputation :karma,
-    :source => :user,
-    :aggregated_by => :sum
-
-  handle_asynchronously :add_evaluation
-  handle_asynchronously :update_evaluation
-  handle_asynchronously :delete_evaluation
-end
-```
-
-### Reflect Past Data
-
-If you wish to reflect past data into new reputation system, I recommend you write a script which simulates all evaluations that would have happened in the past. You probably want to use [collectiveidea's Delayed Job](https://github.com/collectiveidea/delayed_job) to enqueue those past evaluation tasks first and then new ongoing evaluation task so that evaluations are performed in proper time sequence.
-
-## Running Tests
-
-`rake` should do the trick. Tests are written in RSpec.
+* RailsCasts: http://railscasts.com/episodes/364-active-record-reputation-system
+* Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
 
 ## Versioning
 
@@ -282,15 +125,6 @@ And constructed with the following guidelines:
 * Bug fixes and misc changes bump the patch
 
 For more information on semantic versioning, please visit http://semver.org/.
-
-## Authors
-
-* Katsuya Noguchi: http://github.com/katsuyan
-* Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
-
-## Related Links
-
-* RailsCasts: http://railscasts.com/episodes/364-active-record-reputation-system
 
 ## License
 

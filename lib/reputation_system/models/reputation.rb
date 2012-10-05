@@ -17,6 +17,7 @@
 module ReputationSystem
   class Reputation < ActiveRecord::Base
     self.table_name = 'rs_reputations'
+
     belongs_to :target, :polymorphic => true
     has_many :received_messages, :class_name => 'ReputationSystem::ReputationMessage', :foreign_key => :receiver_id, :dependent => :destroy do
       def from(sender)
@@ -48,8 +49,6 @@ module ReputationSystem
     def self.create_reputation(reputation_name, target, process)
       create_options = {:reputation_name => reputation_name.to_s, :target_id => target.id,
                         :target_type => target.class.name, :aggregated_by => process.to_s}
-      default_value = ReputationSystem::Network.get_reputation_def(target.class.name, reputation_name)[:init_value]
-      create_options.merge!(:value => default_value) if default_value
       rep = create(create_options)
       initialize_reputation_value(rep, target, process)
     end
@@ -75,20 +74,24 @@ module ReputationSystem
       save_succeeded
     end
 
-    def self.update_reputation_value_with_updated_source(rep, source, oldValue, weight, process)
+    def self.update_reputation_value_with_updated_source(rep, source, oldValue, newSize, weight, process)
       weight ||= 1 # weight is 1 by default.
-      size = rep.received_messages.size
-      valueBeforeUpdate = size > 0 ? rep.value : nil
+      oldSize = rep.received_messages.size
+      valueBeforeUpdate = oldSize > 0 ? rep.value : nil
       newValue = source.value
-      case process.to_sym
-      when :sum
-        rep.value += (newValue - oldValue) * weight
-      when :average
-        rep.value += ((newValue - oldValue) * weight) / size
-      when :product
-        rep.value = (rep.value * newValue) / oldValue
+      if newSize == 0
+        rep.value = process.to_sym == :product ? 1 : 0
       else
-        raise ArgumentError, "#{process} process is not supported yet"
+        case process.to_sym
+        when :sum
+          rep.value += (newValue - oldValue) * weight
+        when :average
+          rep.value = (rep.value * oldSize + (newValue - oldValue) * weight) / newSize
+        when :product
+          rep.value = (rep.value * newValue) / oldValue
+        else
+          raise ArgumentError, "#{process} process is not supported yet"
+        end
       end
       save_succeeded = rep.save
       propagate_updated_reputation_value(rep, valueBeforeUpdate) if rep.target
@@ -156,7 +159,8 @@ module ReputationSystem
         unless oldValue
           update_reputation_value_with_new_source(receiver, sender, weight, process)
         else
-          update_reputation_value_with_updated_source(receiver, sender, oldValue, weight, process)
+          newSize = receiver.received_messages.size
+          update_reputation_value_with_updated_source(receiver, sender, oldValue, newSize, weight, process)
         end
       end
 

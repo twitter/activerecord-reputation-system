@@ -1,10 +1,28 @@
-* Remove reputation_value_for and normalized_reputation_value_for methods.
+## ActiveRecordReputationSystem 2.0.0 ##
+
+* Deprecate `init_value` option.
+
+* Fix a average computation bug associated with deletes.
+
+* `delete_evaluation` returns false on failure, instead of nil.
+
+* Add `has_evaluation?` method.
+
+* Add auto-require `reputation_system`.
+
+* Add `evaluators_for` method.
+
+* Deprecate `reputation_value_for` and `normalized_reputation_value_for` methods.
 
 * Add `evaluations` association for all evaluation targets.
 
 * Set `:sum` as default for `aggregated_by` option.
 
 * Rename models - RSReputation to ReputationSystem::Reputation, RSEvaluation to ReputationSystem::Evaluation and RSReputationMessage to ReputationSystem::ReputationMessage
+
+## ActiveRecordReputationSystem 1.5.1 ##
+
+* Fix a bug that raises exception when associations related reputation propageted has not been initialized at that time.
 
 ## ActiveRecordReputationSystem 1.5.0 ##
 

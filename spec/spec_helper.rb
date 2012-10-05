@@ -155,8 +155,7 @@ class Answer < ActiveRecord::Base
 
   has_reputation :avg_rating,
     :source => :user,
-    :aggregated_by => :average,
-    :init_value => 1
+    :aggregated_by => :average
 end
 
 class Phrase < ActiveRecord::Base

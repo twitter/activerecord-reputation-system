@@ -33,6 +33,19 @@ module ReputationSystem
       klass.extend ClassMethods
     end
 
+    def has_evaluation?(reputation_name, source, *args)
+      scope = args.first
+      srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
+      !!ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(srn, source, self)
+    end
+
+
+    def evaluators_for(reputation_name, *args)
+      scope = args.first
+      srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
+      self.evaluations.for(srn).includes(:source).map(&:source)
+    end
+
     def add_evaluation(reputation_name, value, source, *args)
       scope = args.first
       srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
@@ -49,7 +62,8 @@ module ReputationSystem
       evaluation.save!
       process = ReputationSystem::Network.get_reputation_def(self.class.name, srn)[:aggregated_by]
       rep = ReputationSystem::Reputation.find_by_reputation_name_and_target(srn, self)
-      ReputationSystem::Reputation.update_reputation_value_with_updated_source(rep, evaluation, oldValue, 1, process)
+      newSize = rep.received_messages.size
+      ReputationSystem::Reputation.update_reputation_value_with_updated_source(rep, evaluation, oldValue, newSize, 1, process)
     end
 
     def add_or_update_evaluation(reputation_name, value, source, *args)
@@ -63,7 +77,11 @@ module ReputationSystem
 
     def delete_evaluation(reputation_name, source, *args)
       srn, evaluation = find_srn_and_evaluation(reputation_name, source, args.first)
-      delete_evaluation_without_validation(srn, evaluation) if evaluation
+      if evaluation
+        !!delete_evaluation_without_validation(srn, evaluation)
+      else
+        false
+      end
     end
 
     def delete_evaluation!(reputation_name, source, *args)
@@ -103,7 +121,8 @@ module ReputationSystem
         oldValue = evaluation.value
         evaluation.value = process == :product ? 1 : 0
         rep = ReputationSystem::Reputation.find_by_reputation_name_and_target(srn, self)
-        ReputationSystem::Reputation.update_reputation_value_with_updated_source(rep, evaluation, oldValue, 1, process)
+        newSize = rep.received_messages.size - 1
+        ReputationSystem::Reputation.update_reputation_value_with_updated_source(rep, evaluation, oldValue, newSize, 1, process)
         evaluation.destroy
       end
 

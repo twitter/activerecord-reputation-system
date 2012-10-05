@@ -116,4 +116,21 @@ describe ReputationSystem::Reputation do
       @r4.normalized_value.should be_within(DELTA).of(0)
     end
   end
+
+  describe "value propagation with average process" do
+    it "should calculate average reputation even after evaluation is deleted" do
+      user1 = User.create! :name => 'dick'
+      user2 = User.create! :name => 'katsuya'
+      answer = Answer.create!
+      answer.add_evaluation(:avg_rating, 3, user1)
+      answer.add_evaluation(:avg_rating, 2, user2)
+      answer.reputation_for(:avg_rating).should be_within(DELTA).of(2.5)
+      answer.delete_evaluation(:avg_rating, user1)
+      answer.reputation_for(:avg_rating).should be_within(DELTA).of(2)
+      answer.delete_evaluation(:avg_rating, user2)
+      answer.reputation_for(:avg_rating).should be_within(DELTA).of(0)
+      answer.add_evaluation(:avg_rating, 3, user1)
+      answer.reputation_for(:avg_rating).should be_within(DELTA).of(3)
+    end
+  end
 end
