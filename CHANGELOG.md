@@ -1,3 +1,5 @@
+## ActiveRecordReputationSystem 2.0.0 ##
+
 * Deprecate `init_value` option.
 
 * Fix a average computation bug associated with deletes.
