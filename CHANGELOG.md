@@ -1,3 +1,7 @@
+* Deprecate `init_value` option.
+
+* Fix a average computation bug associated with deletes.
+
 * `delete_evaluation` returns false on failure, instead of nil.
 
 * Add `has_evaluation?` method.
@@ -6,7 +10,7 @@
 
 * Add `evaluators_for` method.
 
-* Remove `reputation_value_for` and `normalized_reputation_value_for` methods.
+* Deprecate `reputation_value_for` and `normalized_reputation_value_for` methods.
 
 * Add `evaluations` association for all evaluation targets.
 

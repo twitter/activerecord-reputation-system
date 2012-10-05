@@ -54,10 +54,6 @@ describe ActiveRecord::Base do
         ReputationSystem::Reputation.count.should < reputation_count
         ReputationSystem::ReputationMessage.count.should < message_count
       end
-
-      it "should have declared default value if any" do
-        @answer.reputation_for(:avg_rating).should == 1
-      end
     end
   end
 
