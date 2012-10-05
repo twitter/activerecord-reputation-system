@@ -76,7 +76,11 @@ module ReputationSystem
 
     def delete_evaluation(reputation_name, source, *args)
       srn, evaluation = find_srn_and_evaluation(reputation_name, source, args.first)
-      delete_evaluation_without_validation(srn, evaluation) if evaluation
+      if evaluation
+        !!delete_evaluation_without_validation(srn, evaluation)
+      else
+        false
+      end
     end
 
     def delete_evaluation!(reputation_name, source, *args)

@@ -1,3 +1,5 @@
+* `delete_evaluation` returns false on failure, instead of nil.
+
 * Add `has_evaluation?` method.
 
 * Add auto-require `reputation_system`.

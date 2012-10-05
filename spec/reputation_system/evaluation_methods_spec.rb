@@ -294,8 +294,8 @@ describe ActiveRecord::Base do
         lambda { @question.delete_evaluation(:invalid, @user) }.should raise_error(ArgumentError)
       end
 
-      it "should return nil if evaluation does not exist" do
-        @answer.delete_evaluation(:avg_rating, @user).should be_nil
+      it "should return false if evaluation does not exist" do
+        @answer.delete_evaluation(:avg_rating, @user).should be_false
       end
 
       context "With Scopes" do
