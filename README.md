@@ -4,6 +4,8 @@ The Active Record Reputation System helps you discover more about your applicati
 
 ## Installation
 
+* If you are updating to version 2 from version older, you should check out [migration guide](https://github.com/twitter/activerecord-reputation-system/wiki/Migrate-to-Version-2.0).
+
 Add to Gemfile:
 
 ```ruby
@@ -92,8 +94,9 @@ Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wi
 
 ## Authors
 
-* [Katsuya Noguchi](http://github.com/katsuyan)
-* Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
+Katsuya Noguchi
+* [http://twitter.com/kn](http://twitter.com/kn)
+* [http://github.com/katsuyan](http://github.com/katsuyan)
 
 ## Contributors
 
@@ -104,6 +107,7 @@ Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wi
 ## Related Links
 
 * RailsCasts: http://railscasts.com/episodes/364-active-record-reputation-system
+* Inspired by ["Building Web Reputation Systems" by Randy Farmer and Bryce Glass](http://shop.oreilly.com/product/9780596159801.do)
 
 ## Versioning
 
