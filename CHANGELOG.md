@@ -1,3 +1,5 @@
+## ActiveRecordReputationSystem 2.0.1 ##
+
 * Print out future deprecation warning for methods `with_reputation` and `with_normalized_reputation`.
 
 * Fix a finder related bug.
