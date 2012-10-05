@@ -26,14 +26,14 @@ module FinderMethods
         reputation_name, srn, find_scope, options = parse_query_args(*args)
         options[:select] = build_select_statement(table_name, reputation_name, options[:select])
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
-        options[:conditions] = build_condition_statement(options[:conditions])
+        options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         find(find_scope, options)
       end
 
       def count_with_reputation(*args)
         reputation_name, srn, find_scope, options = parse_query_args(*args)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
-        options[:conditions] = build_condition_statement(options[:conditions])
+        options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         options[:conditions][0].gsub!(reputation_name.to_s, "COALESCE(rs_reputations.value, 0)")
         count(find_scope, options)
       end
@@ -42,7 +42,7 @@ module FinderMethods
         reputation_name, srn, find_scope, options = parse_query_args(*args)
         options[:select] = build_select_statement(table_name, reputation_name, options[:select], srn, true)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
-        options[:conditions] = build_condition_statement(options[:conditions])
+        options[:conditions] = build_condition_statement(reputation_name, options[:conditions], srn, true)
         find(find_scope, options)
       end
 
@@ -50,7 +50,7 @@ module FinderMethods
         reputation_name, srn, find_scope, options = parse_query_args(*args)
         options[:select] = build_select_statement(table_name, reputation_name, options[:select])
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
-        options[:conditions] = build_condition_statement(options[:conditions])
+        options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         if respond_to?(:construct_finder_sql, true)
           construct_finder_sql(options)
         else

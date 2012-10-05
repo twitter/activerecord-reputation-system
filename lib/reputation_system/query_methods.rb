@@ -22,6 +22,7 @@ module ReputationSystem
 
     module ClassMethods
       def with_reputation(*args)
+        warn "[DEPRECATION] `with_reputation` will be deprecated in version 3.0.0. Please use finder methods instead."
         reputation_name, srn = parse_arel_query_args(args)
         select = build_select_statement(table_name, reputation_name)
         joins = build_join_statement(table_name, name, srn)
@@ -29,6 +30,7 @@ module ReputationSystem
       end
 
       def with_reputation_only(*args)
+        warn "[DEPRECATION] `with_reputation_only` will be deprecated in version 3.0.0. Please use finder methods instead."
         reputation_name, srn = parse_arel_query_args(args)
         select = build_select_statement_with_reputation_only(table_name, reputation_name)
         joins = build_join_statement(table_name, name, srn)
@@ -36,6 +38,7 @@ module ReputationSystem
       end
 
       def with_normalized_reputation(*args)
+        warn "[DEPRECATION] `with_normalized_reputation` will be deprecated in version 3.0.0. Please use finder methods instead."
         reputation_name, srn = parse_arel_query_args(args)
         select = build_select_statement(table_name, reputation_name, nil, srn, true)
         joins = build_join_statement(table_name, name, srn)
@@ -43,6 +46,7 @@ module ReputationSystem
       end
 
       def with_normalized_reputation_only(*args)
+        warn "[DEPRECATION] `with_normalized_reputation_only` will be deprecated in version 3.0.0. Please use finder methods instead."
         reputation_name, srn = parse_arel_query_args(args)
         select = build_select_statement_with_reputation_only(table_name, reputation_name, srn, true)
         joins = build_join_statement(table_name, name, srn)
