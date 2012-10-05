@@ -7,7 +7,7 @@ The Active Record Reputation System helps you discover more about your applicati
 Add to Gemfile:
 
 ```ruby
-gem 'activerecord-reputation-system', :require => 'reputation_system'
+gem 'activerecord-reputation-system'
 ```
 
 Run:
@@ -31,16 +31,13 @@ class User < ActiveRecord::Base
   has_reputation :karma,
       :source => [
           { :reputation => :questioning_skill, :weight => 0.8 },
-          { :reputation => :answering_skill }],
-      :aggregated_by => :sum
+          { :reputation => :answering_skill }]
 
   has_reputation :questioning_skill,
-      :source => { :reputation => :votes, :of => :questions },
-      :aggregated_by => :sum
+      :source => { :reputation => :votes, :of => :questions }
 
   has_reputation :answering_skill,
-      :source => { :reputation => :avg_rating, :of => :answers },
-      :aggregated_by => :sum
+      :source => { :reputation => :avg_rating, :of => :answers }
 end
 
 class Answer < ActiveRecord::Base
@@ -57,8 +54,7 @@ class Question < ActiveRecord::Base
   belongs_to :user
 
   has_reputation :votes,
-      :source => :user,
-      :aggregated_by => :sum
+      :source => :user
 end
 ```
 
@@ -70,9 +66,24 @@ Once reputation system is defined, evaluations for answers and questions can be 
 
 Reputation value can be accessed as follow:
 ```ruby
-@answer.reptuation_for(:avg_rating)
-@question.reptuation_for(:votes)
+@answer.reptuation_for(:avg_rating) #=> 3
+@question.reptuation_for(:votes) #=> 1
 @user.reptuation_for(:karma)
+```
+
+You can query for records using reputation value:
+```ruby
+@user.with_reputation(:karma).where('karma > 10')
+```
+
+You can get source records that have evaluated the target record:
+```ruby
+@question.evaluators_for(:votes) #=> [@user]
+```
+
+You can get target records that have been evaluated by a given source record:
+```ruby
+Question.evaluated_by(:votes, @user) #=> [@question]
 ```
 
 ## Documentation
