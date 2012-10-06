@@ -78,7 +78,7 @@ Reputation value can be accessed as follow:
 
 You can query for records using reputation value:
 ```ruby
-@user.with_reputation(:karma).where('karma > 10')
+@user.find_with_reputation(:karma, :all, { :condition => 'karma > 10' })
 ```
 
 You can get source records that have evaluated the target record:
