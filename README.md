@@ -71,9 +71,9 @@ Once reputation system is defined, evaluations for answers and questions can be 
 
 Reputation value can be accessed as follow:
 ```ruby
-@answer.reptuation_for(:avg_rating) #=> 3
-@question.reptuation_for(:votes) #=> 1
-@user.reptuation_for(:karma)
+@answer.reputation_for(:avg_rating) #=> 3
+@question.reputation_for(:votes) #=> 1
+@user.reputation_for(:karma)
 ```
 
 You can query for records using reputation value:
