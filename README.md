@@ -99,7 +99,7 @@ Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wi
 
 Katsuya Noguchi
 * [http://twitter.com/kn](http://twitter.com/kn)
-* [http://github.com/katsuyan](http://github.com/katsuyan)
+* [http://github.com/kn](http://github.com/kn)
 
 ## Contributors
 
