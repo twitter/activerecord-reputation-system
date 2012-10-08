@@ -93,7 +93,7 @@ Question.evaluated_by(:votes, @user) #=> [@question]
 
 ## Documentation
 
-Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wiki) for available APIs.
+Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wiki) for available APIs and more information.
 
 ## Authors
 
