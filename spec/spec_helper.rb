@@ -108,6 +108,11 @@ ActiveRecord::Schema.define do
     t.string :type
     t.timestamps
   end
+
+  create_table :posts do |t|
+    t.string :name
+    t.timestamps
+  end
 end
 
 class User < ActiveRecord::Base
@@ -193,6 +198,8 @@ class Translation < ActiveRecord::Base
     :source_of => { :reputation => :maturity, :of => :phrase, :scope => :locale}
 end
 
+# For STI Specs
+
 class Person < ActiveRecord::Base
   has_reputation :leadership,
     :source => :person,
@@ -203,4 +210,11 @@ class Programmer < Person
 end
 
 class Designer < Person
+end
+
+class Post < ActiveRecord::Base
+  belongs_to :person
+
+  has_reputation :votes,
+    :source => :person
 end

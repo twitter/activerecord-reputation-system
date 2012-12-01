@@ -140,7 +140,7 @@ describe ReputationSystem::EvaluationMethods do
         lambda { answer.add_evaluation(:avg_rating, 3, @user) }.should_not raise_error
       end
 
-      context "With Scopes" do
+      context "with scopes" do
         it "should add evaluation on appropriate scope" do
           @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
           @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
@@ -171,7 +171,7 @@ describe ReputationSystem::EvaluationMethods do
         @question.reputation_for(:total_votes).should == 2
       end
 
-      context "With Scopes" do
+      context "with scopes" do
         it "should add evaluation on appropriate scope if it does not exist" do
           @phrase.add_or_update_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
           @phrase.add_or_update_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
@@ -188,6 +188,16 @@ describe ReputationSystem::EvaluationMethods do
           @phrase.reputation_for(:difficulty_with_scope, :s1).should == 3
           @phrase.reputation_for(:difficulty_with_scope, :s2).should == 5
           @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
+        end
+      end
+
+      context "with STI" do
+        it "should be able to update evaluation by an object of a class with sti" do
+          @post = Post.create! :name => "Post1"
+          @designer = Designer.create! :name => "John"
+          @post.add_or_update_evaluation(:votes, 1, @designer)
+          @post.add_or_update_evaluation(:votes, -1, @designer)
+          @post.reputation_for(:votes).should == -1
         end
       end
     end

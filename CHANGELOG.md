@@ -1,3 +1,5 @@
+* Fix a bug associated with `add_or_update_evaluation` method that happens when source uses STI.
+
 ## ActiveRecordReputationSystem 2.0.1 ##
 
 * Print out future deprecation warning for methods `with_reputation` and `with_normalized_reputation`.
