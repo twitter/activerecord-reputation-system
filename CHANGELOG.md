@@ -1,3 +1,5 @@
+## ActiveRecordReputationSystem 2.0.2 ##
+
 * Fix a bug associated with `add_or_update_evaluation` method that happens when source uses STI.
 
 ## ActiveRecordReputationSystem 2.0.1 ##
