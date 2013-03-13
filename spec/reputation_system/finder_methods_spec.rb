@@ -32,13 +32,13 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        res = Question.find_with_reputation(:total_votes, :all, {})
+        res = Question.find_with_reputation(:total_votes, {})
         res.should == [@question]
         res[0].total_votes.should_not be_nil
       end
 
       it "should retain select option" do
-        res = Question.find_with_reputation(:total_votes, :all, {:select => "questions.id"})
+        res = Question.find_with_reputation(:total_votes, {:select => "questions.id"})
         res.should == [@question]
         res[0].id.should_not be_nil
         lambda {res[0].text}.should raise_error
@@ -47,12 +47,12 @@ describe ReputationSystem::FinderMethods do
       it "should retain conditions option" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 5, @user)
-        res = Question.find_with_reputation(:total_votes, :all, {:conditions => "total_votes > 4"})
+        res = Question.find_with_reputation(:total_votes, {:conditions => "total_votes > 4"})
         res.should == [@question2]
       end
 
       it "should retain joins option" do
-        res = Question.find_with_reputation(:total_votes, :all, {
+        res = Question.find_with_reputation(:total_votes, {
           :select => "questions.*, users.name AS user_name",
           :joins => "JOIN users ON questions.author_id = users.id"})
         res.should == [@question]
@@ -69,7 +69,7 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        res = Phrase.find_with_reputation(:maturity, :ja, :all, {})
+        res = Phrase.find_with_reputation(:maturity, :ja, {})
         res.should == [@phrase]
         res[0].maturity.should == 3
       end
@@ -83,10 +83,10 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        Question.count_with_reputation(:total_votes, :all, {
+        Question.count_with_reputation(:total_votes, {
           :conditions => "total_votes < 2"
         }).should == 0
-        Question.count_with_reputation(:total_votes, :all, {
+        Question.count_with_reputation(:total_votes, {
           :conditions => "total_votes > 2"
         }).should == 1
       end
@@ -101,10 +101,10 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        Phrase.count_with_reputation(:maturity, :ja, :all, {
+        Phrase.count_with_reputation(:maturity, :ja, {
           :conditions => "maturity < 2"
         }).should == 0
-        Phrase.count_with_reputation(:maturity, :ja, :all, {
+        Phrase.count_with_reputation(:maturity, :ja, {
           :conditions => "maturity > 2"
         }).should == 1
       end
@@ -120,14 +120,14 @@ describe ReputationSystem::FinderMethods do
       it "should return result with given normalized reputation" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 6, @user)
-        res = Question.find_with_normalized_reputation(:total_votes, :all, {})
+        res = Question.find_with_normalized_reputation(:total_votes, {})
         res.should == [@question, @question2]
         res[0].normalized_total_votes.should be_within(DELTA).of(0)
         res[1].normalized_total_votes.should be_within(DELTA).of(1)
       end
 
       it "should retain select option" do
-        res = Question.find_with_normalized_reputation(:total_votes, :all, {:select => "questions.id"})
+        res = Question.find_with_normalized_reputation(:total_votes, {:select => "questions.id"})
         res.should == [@question]
         res[0].id.should_not be_nil
         lambda {res[0].text}.should raise_error
@@ -136,12 +136,12 @@ describe ReputationSystem::FinderMethods do
       it "should retain conditions option" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 6, @user)
-        res = Question.find_with_normalized_reputation(:total_votes, :all, {:conditions => "normalized_total_votes > 0.6"})
+        res = Question.find_with_normalized_reputation(:total_votes, {:conditions => "normalized_total_votes > 0.6"})
         res.should == [@question2]
       end
 
       it "should retain joins option" do
-        res = Question.find_with_normalized_reputation(:total_votes, :all, {
+        res = Question.find_with_normalized_reputation(:total_votes, {
           :select => "questions.*, users.name AS user_name",
           :joins => "JOIN users ON questions.author_id = users.id"})
         res.should == [@question]
@@ -158,7 +158,7 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        res = Phrase.find_with_normalized_reputation(:maturity, :ja, :all, {})
+        res = Phrase.find_with_normalized_reputation(:maturity, :ja, {})
         res.should == [@phrase]
         res[0].normalized_maturity.should be_within(DELTA).of(0)
       end
@@ -167,7 +167,7 @@ describe ReputationSystem::FinderMethods do
 
   describe "#find_with_reputation_sql" do
     it "should return a corresponding sql statement" do
-      sql = Question.find_with_reputation_sql(:total_votes, :all, {
+      sql = Question.find_with_reputation_sql(:total_votes, {
         :select => "questions.*, users.name AS user_name",
         :joins => "JOIN users ON questions.author_id = users.id",
         :conditions => "COALESCE(rs_reputations.value, 0) > 0.6",
