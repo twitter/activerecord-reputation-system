@@ -70,11 +70,9 @@ module ReputationSystem
           case args.length
           when 1
             options = {}
-          when 2
-            options = args[1]
-          when 3
+          when 2, 3
             scope = args[1]
-            options = args[2]
+            options = args[2] || {}
           else
             raise ArgumentError, "Expecting 1, 2 or 3 arguments but got #{args.length}"
           end
