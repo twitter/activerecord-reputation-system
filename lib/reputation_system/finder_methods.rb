@@ -68,14 +68,17 @@ module ReputationSystem
 
         def parse_query_args(*args)
           case args.length
-          when 1
-            options = {}
-          when 2, 3
-            scope = args[1]
-            options = args[2] || {}
-          else
-            raise ArgumentError, "Expecting 1, 2 or 3 arguments but got #{args.length}"
+            when 1
+              options = {}
+            when 2
+              options = args[1]
+            when 3
+              scope = args[1]
+              options = args[2] || {}
+            else
+              raise ArgumentError, "Expecting 1, 2 or 3 arguments but got #{args.length}"
           end
+
           reputation_name = args[0]
           srn = ReputationSystem::Network.get_scoped_reputation_name(name, reputation_name, scope)
           [reputation_name, srn, options]
