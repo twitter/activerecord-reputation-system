@@ -16,6 +16,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rake', ">=0.8.7"
   s.add_development_dependency 'rspec', "~>2.8"
   s.add_development_dependency 'rdoc'
+  s.add_development_dependency 'pry-nav'
   s.add_development_dependency 'database_cleaner', "~>0.7.1"
   s.add_development_dependency 'sqlite3', "~>1.3.5"
 

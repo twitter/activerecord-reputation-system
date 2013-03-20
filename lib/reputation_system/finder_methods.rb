@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/delegation'
+
 ##
 #  Copyright 2012 Twitter, Inc
 #
@@ -20,10 +22,19 @@ module ReputationSystem
       klass.extend ClassMethods
     end
 
+    class ReputationSystemRelation < ActiveRecord::Relation
+      def count
+        table_alias = Arel::Nodes::SqlLiteral.new("DUMMY_TABLE_ALIAS_42")
+        count_literal = Arel::Nodes::SqlLiteral.new("count")
+        klass.select(Arel::Nodes::As.new(Arel::Nodes::Count.new([Arel.sql("*")]), count_literal)).from(Arel::Nodes::As.new(Arel::Nodes::Grouping.new(self.ast), table_alias)).first.count
+      end
+    end
+
     module ClassMethods
 
       def find_with_reputation(*args)
-        perform_find(construct_finder_options(*args))
+        r = ReputationSystemRelation.new(self, self.arel_table)
+        perform_find(r, construct_finder_options(*args))
       end
 
       def count_with_reputation(*args)
@@ -31,7 +42,8 @@ module ReputationSystem
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         options[:conditions][0].gsub!(reputation_name.to_s, "COALESCE(rs_reputations.value, 0)")
-        perform_find(options).count
+        r = ReputationSystemRelation.new(self, self.arel_table)
+        perform_find(r, options).count
       end
 
       def find_with_normalized_reputation(*args)
@@ -39,12 +51,14 @@ module ReputationSystem
         options[:select] = build_select_statement(table_name, reputation_name, options[:select], srn, true)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions], srn, true)
-        perform_find(options)
+        r = ReputationSystemRelation.new(self, self.arel_table)
+        perform_find(r, options)
       end
 
       def find_with_reputation_sql(*args)
         options = construct_finder_options(*args)
-        perform_find(options).to_sql
+        r = ReputationSystemRelation.new(self, self.arel_table)
+        perform_find(r, options).to_sql
       end
 
       protected
@@ -57,8 +71,8 @@ module ReputationSystem
           options
         end
 
-        def perform_find(options)
-          select(options[:select]).
+        def perform_find(r, options)
+          r.select(options[:select]).
           joins(options[:joins]).
           where(options[:conditions]).
           order(options[:order]).
