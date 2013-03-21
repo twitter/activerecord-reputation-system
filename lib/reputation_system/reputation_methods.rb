@@ -46,7 +46,7 @@ module ReputationSystem
     def rank_for(reputation_name, *args)
       scope = args.first
       my_value = self.reputation_for(reputation_name, scope)
-      self.class.count_with_reputation(reputation_name, scope, :all,
+      self.class.count_with_reputation(reputation_name, scope,
         :conditions => ["rs_reputations.value > ?", my_value]
       ) + 1
     end

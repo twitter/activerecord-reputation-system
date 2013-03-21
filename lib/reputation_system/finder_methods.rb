@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/delegation'
+
 ##
 #  Copyright 2012 Twitter, Inc
 #
@@ -15,69 +17,90 @@
 ##
 
 module ReputationSystem
-module FinderMethods
+  module FinderMethods
     def self.included(klass)
       klass.extend ClassMethods
+    end
+
+    class ReputationSystemRelation < ActiveRecord::Relation
+      def count
+        table_alias = Arel::Nodes::SqlLiteral.new("DUMMY_TABLE_ALIAS_42")
+        count_literal = Arel::Nodes::SqlLiteral.new("count")
+        self.select_values.reject! do |e|
+          if e.is_a?(Arel::Attributes::Attribute)
+            e.relation.engine == self.klass
+          end
+        end
+        klass.select(Arel::Nodes::As.new(Arel::Nodes::Count.new([Arel.sql("*")]), count_literal)).from(Arel::Nodes::As.new(Arel::Nodes::Grouping.new(self.ast), table_alias)).first.count
+      end
     end
 
     module ClassMethods
 
       def find_with_reputation(*args)
-        reputation_name, srn, find_scope, options = parse_query_args(*args)
-        options[:select] = build_select_statement(table_name, reputation_name, options[:select])
-        options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
-        options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
-        find(find_scope, options)
+        r = ReputationSystemRelation.new(self, self.arel_table)
+        perform_find(r, construct_finder_options(*args))
       end
 
       def count_with_reputation(*args)
-        reputation_name, srn, find_scope, options = parse_query_args(*args)
+        reputation_name, srn, options = parse_query_args(*args)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         options[:conditions][0].gsub!(reputation_name.to_s, "COALESCE(rs_reputations.value, 0)")
-        count(find_scope, options)
+        r = ReputationSystemRelation.new(self, self.arel_table)
+        perform_find(r, options).count
       end
 
       def find_with_normalized_reputation(*args)
-        reputation_name, srn, find_scope, options = parse_query_args(*args)
+        reputation_name, srn, options = parse_query_args(*args)
         options[:select] = build_select_statement(table_name, reputation_name, options[:select], srn, true)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions], srn, true)
-        find(find_scope, options)
+        r = ReputationSystemRelation.new(self, self.arel_table)
+        perform_find(r, options)
       end
 
       def find_with_reputation_sql(*args)
-        reputation_name, srn, find_scope, options = parse_query_args(*args)
-        options[:select] = build_select_statement(table_name, reputation_name, options[:select])
-        options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
-        options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
-        if respond_to?(:construct_finder_sql, true)
-          construct_finder_sql(options)
-        else
-          construct_finder_arel(options).to_sql
-        end
+        options = construct_finder_options(*args)
+        r = ReputationSystemRelation.new(self, self.arel_table)
+        perform_find(r, options).to_sql
       end
 
       protected
 
+        def construct_finder_options(*args)
+          reputation_name, srn, options = parse_query_args(*args)
+          options[:select] = build_select_statement(table_name, reputation_name, options[:select])
+          options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
+          options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
+          options
+        end
+
+        def perform_find(r, options)
+          r.select(options[:select]).
+          joins(options[:joins]).
+          where(options[:conditions]).
+          order(options[:order]).
+          group(options[:group]).
+          limit(options[:limit])
+        end
+
         def parse_query_args(*args)
           case args.length
-          when 2
-            find_scope = args[1]
-            options = {}
-          when 3
-            find_scope = args[1]
-            options = args[2]
-          when 4
-            scope = args[1]
-            find_scope = args[2]
-            options = args[3]
-          else
-            raise ArgumentError, "Expecting 2, 3 or 4 arguments but got #{args.length}"
+            when 1
+              options = {}
+            when 2
+              options = args[1]
+            when 3
+              scope = args[1]
+              options = args[2] || {}
+            else
+              raise ArgumentError, "Expecting 1, 2 or 3 arguments but got #{args.length}"
           end
+
           reputation_name = args[0]
           srn = ReputationSystem::Network.get_scoped_reputation_name(name, reputation_name, scope)
-          [reputation_name, srn, find_scope, options]
+          [reputation_name, srn, options]
         end
     end
   end
