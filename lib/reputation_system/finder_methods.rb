@@ -26,6 +26,11 @@ module ReputationSystem
       def count
         table_alias = Arel::Nodes::SqlLiteral.new("DUMMY_TABLE_ALIAS_42")
         count_literal = Arel::Nodes::SqlLiteral.new("count")
+        self.select_values.reject! do |e|
+          if e.is_a?(Arel::Attributes::Attribute)
+            e.relation.engine == self.klass
+          end
+        end
         klass.select(Arel::Nodes::As.new(Arel::Nodes::Count.new([Arel.sql("*")]), count_literal)).from(Arel::Nodes::As.new(Arel::Nodes::Grouping.new(self.ast), table_alias)).first.count
       end
     end
