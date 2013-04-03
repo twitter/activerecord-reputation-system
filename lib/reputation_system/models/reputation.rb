@@ -26,8 +26,6 @@ module ReputationSystem
     end
     has_many :sent_messages, :as => :sender, :class_name => 'ReputationSystem::ReputationMessage', :dependent => :destroy
 
-    attr_accessible :reputation_name, :value, :aggregated_by, :active, :target, :target_id, :target_type, :received_messages
-
     before_validation :set_target_type_for_sti
     before_save :change_zero_value_in_case_of_product_process
 
@@ -175,13 +173,11 @@ module ReputationSystem
       end
 
       def self.max(reputation_name, target_type)
-        ReputationSystem::Reputation.maximum(:value,
-                             :conditions => {:reputation_name => reputation_name.to_s, :target_type => target_type, :active => true})
+        ReputationSystem::Reputation.where(:reputation_name => reputation_name.to_s, :target_type => target_type, :active => true).maximum(:value)
       end
 
       def self.min(reputation_name, target_type)
-        ReputationSystem::Reputation.minimum(:value,
-                             :conditions => {:reputation_name => reputation_name.to_s, :target_type => target_type, :active => true})
+        ReputationSystem::Reputation.where(:reputation_name => reputation_name.to_s, :target_type => target_type, :active => true).minimum(:value)
       end
 
       def self.get_target_type_for_sti(target, reputation_name)

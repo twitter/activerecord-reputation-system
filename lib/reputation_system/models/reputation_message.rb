@@ -20,8 +20,6 @@ module ReputationSystem
     belongs_to :sender, :polymorphic => true
     belongs_to :receiver, :class_name => 'ReputationSystem::Reputation'
 
-    attr_accessible :weight, :sender, :receiver
-
     # The same sender cannot send massage to the same receiver more than once.
     validates_uniqueness_of :receiver_id, :scope => [:sender_id, :sender_type]
     validate :sender_must_be_evaluation_or_reputation
@@ -44,6 +42,6 @@ module ReputationSystem
           errors.add(:sender, "must be an evaluation or a reputation")
         end
       end
-        
+
   end
 end
