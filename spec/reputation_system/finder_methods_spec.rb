@@ -177,6 +177,7 @@ describe ReputationSystem::FinderMethods do
         "FROM \"questions\" JOIN users ON questions.author_id = users.id "\
         "LEFT JOIN rs_reputations ON questions.id = rs_reputations.target_id AND rs_reputations.target_type = 'Question' AND rs_reputations.reputation_name = 'total_votes' AND rs_reputations.active = 't' "\
         "WHERE (COALESCE(rs_reputations.value, 0) > 0.6) "\
+        " " if ActiveRecord::VERSION::STRING >= '4' \
         "ORDER BY total_votes"
     end
   end
