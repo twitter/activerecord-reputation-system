@@ -41,7 +41,12 @@ module ReputationSystem
 
     def evaluation_value(reputation_name, source, *args)
       srn, evaluation = find_srn_and_evaluation!(reputation_name, source, args.first)
-      return evaluation.value
+      if evaluation
+        return evaluation.value
+      else
+        false
+      end
+
     end
 
     def evaluators_for(reputation_name, *args)
