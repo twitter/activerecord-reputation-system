@@ -86,6 +86,47 @@ describe ReputationSystem::EvaluationMethods do
       end
     end
 
+    describe "#evaluation_by" do
+      it "should return an empty array if it is not evaluated by a given source" do
+        Question.evaluated_by(:total_votes, @user).should == []
+      end
+
+      it "should return a value for an evaluation by a given source" do
+        user2 = User.create!(:name => 'katsuya')
+        question2 = Question.create!(:text => 'Question 2', :author_id => @user.id)
+        question3 = Question.create!(:text => 'Question 3', :author_id => @user.id)
+        @question.add_evaluation(:total_votes, 1, @user).should be_true
+        question2.add_evaluation(:total_votes, 2, user2).should be_true
+        question3.add_evaluation(:total_votes, 3, @user).should be_true
+        @question.evaluation_by(:total_votes, @user).should == [1]
+        @question2.evaluation_by(:total_votes, user2).should == [2]
+        @question3.evaluation_by(:total_votes, @user).should == [3]
+      end
+
+      context "With Scopes" do
+        it "should return a value for an evaluation by a given source on appropriate scope" do
+          user2 = User.create!(:name => 'katsuya')
+          phrase2 = Phrase.create!(:text => "Two")
+          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 3, user2, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 4, user2, :s3).should be_true
+          phrase2.add_evaluation(:difficulty_with_scope, 1, user2, :s1).should be_true
+          phrase2.add_evaluation(:difficulty_with_scope, 2, user2, :s2).should be_true
+          phrase2.add_evaluation(:difficulty_with_scope, 3, @user, :s2).should be_true
+          phrase2.add_evaluation(:difficulty_with_scope, 4, @user, :s3).should be_true
+          @phrase.evaluation_by(:difficulty_with_scope, @user, :s1).should == [1]
+          @phrase.evaluation_by(:difficulty_with_scope, @user, :s2).should == [2]
+          @phrase.evaluation_by(:difficulty_with_scope, user2, :s2).should == [3]
+          @phrase.evaluation_by(:difficulty_with_scope, user2, :s3).should == [4]
+          phrase2.evaluation_by(:difficulty_with_scope, user2, :s1).should == [1]
+          phrase2.evaluation_by(:difficulty_with_scope, user2, :s2).should == [2]
+          phrase2.evaluation_by(:difficulty_with_scope, @user, :s2).should == [3]
+          phrase2.evaluation_by(:difficulty_with_scope, @user, :s3).should == [4]
+        end
+      end
+    end
+
     describe "#evaluators_for" do
       it "should return an empty array if it is not evaluated for a given reputation" do
         @question.evaluators_for(:total_votes).should == []
