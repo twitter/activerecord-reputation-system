@@ -39,14 +39,9 @@ module ReputationSystem
       !!ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(srn, source, self)
     end
 
-    def evaluation_value(reputation_name, source, *args)
+    def evaluation_by(reputation_name, source, *args)
       srn, evaluation = find_srn_and_evaluation!(reputation_name, source, args.first)
-      if evaluation
-        return evaluation.value
-      else
-        false
-      end
-
+      evaluation.try(:value)
     end
 
     def evaluators_for(reputation_name, *args)
