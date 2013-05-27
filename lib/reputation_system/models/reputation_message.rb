@@ -20,7 +20,7 @@ module ReputationSystem
     belongs_to :sender, :polymorphic => true
     belongs_to :receiver, :class_name => 'ReputationSystem::Reputation'
 
-    if ActiveRecord::VERSION::STRING < '4'
+    unless defined?(ActiveModel::ForbiddenAttributesProtection)
       attr_accessible :weight, :sender, :receiver
     end
 

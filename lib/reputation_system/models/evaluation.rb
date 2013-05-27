@@ -22,7 +22,7 @@ module ReputationSystem
     belongs_to :target, :polymorphic => true
     has_one :sent_messages, :as => :sender, :class_name => 'ReputationSystem::ReputationMessage', :dependent => :destroy
 
-    if ActiveRecord::VERSION::STRING < '4'
+    unless defined?(ActiveModel::ForbiddenAttributesProtection)
       attr_accessible :reputation_name, :value, :source, :source_id, :source_type, :target, :target_id, :target_type
     end
 

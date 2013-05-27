@@ -26,7 +26,7 @@ module ReputationSystem
     end
     has_many :sent_messages, :as => :sender, :class_name => 'ReputationSystem::ReputationMessage', :dependent => :destroy
 
-    if ActiveRecord::VERSION::STRING < '4'
+    unless defined?(ActiveModel::ForbiddenAttributesProtection)
       attr_accessible :reputation_name, :value, :aggregated_by, :active, :target, :target_id, :target_type, :received_messages
     end
 
