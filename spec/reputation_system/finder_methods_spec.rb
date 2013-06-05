@@ -180,4 +180,17 @@ describe ReputationSystem::FinderMethods do
         "ORDER BY total_votes"
     end
   end
+
+  describe "#scope_with_reputation" do
+    it "should return ActiveRecord::Relation object" do
+      Question.scope_with_reputation(:total_votes, :all
+      ).class.should eq(ActiveRecord::Relation)
+    end
+
+    it "should be a valid scope" do
+      find_results = Question.find_with_reputation(:total_votes, :all)
+      Question.scope_with_reputation(:total_votes, :all
+      ).all.should eq(find_results)
+    end
+  end
 end

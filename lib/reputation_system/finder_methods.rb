@@ -58,6 +58,14 @@ module FinderMethods
         end
       end
 
+      def scope_with_reputation(*args)
+        reputation_name, srn, find_scope, options = parse_query_args(*args)
+        select_query = build_select_statement(table_name, reputation_name, options[:select])
+        joins_query = build_join_statement(table_name, name, srn, options[:joins])
+        conditions_query = build_condition_statement(reputation_name, options[:conditions])
+        select(select_query).joins(joins_query).where(conditions_query)
+      end
+
       protected
 
         def parse_query_args(*args)
