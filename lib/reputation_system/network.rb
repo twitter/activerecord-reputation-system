@@ -157,6 +157,7 @@ module ReputationSystem
         def get_scoped_reputation_name_from_source_def_and_target(source_def, target)
           scope = target.evaluate_reputation_scope(source_def[:scope]) if source_def[:scope]
           of = target.get_attributes_of(source_def)
+          return "false" if of.blank?
           class_name = (of.is_a?(Array) ? of[0] : of).class.name
           get_scoped_reputation_name(class_name, source_def[:reputation], scope)
         end
