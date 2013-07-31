@@ -77,12 +77,14 @@ module ReputationSystem
         end
 
         def perform_find(r, options)
-          r.select(options[:select]).
+          q = r.select(options[:select]).
           joins(options[:joins]).
           where(options[:conditions]).
           order(options[:order]).
           group(options[:group]).
           limit(options[:limit])
+          q = q.having(options[:having]) if options[:having]
+          q
         end
 
         def parse_query_args(*args)
