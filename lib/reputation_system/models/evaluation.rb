@@ -22,9 +22,7 @@ module ReputationSystem
     belongs_to :target, :polymorphic => true
     has_one :sent_messages, :as => :sender, :class_name => 'ReputationSystem::ReputationMessage', :dependent => :destroy
 
-    unless defined?(ActiveModel::ForbiddenAttributesProtection)
-      attr_accessible :reputation_name, :value, :source, :source_id, :source_type, :target, :target_id, :target_type
-    end
+    attr_accessible :reputation_name, :value, :source, :source_id, :source_type, :target, :target_id, :target_type
 
     # Sets an appropriate source type in case of Single Table Inheritance.
     before_validation :set_source_type_for_sti

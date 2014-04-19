@@ -26,9 +26,7 @@ module ReputationSystem
     end
     has_many :sent_messages, :as => :sender, :class_name => 'ReputationSystem::ReputationMessage', :dependent => :destroy
 
-    unless defined?(ActiveModel::ForbiddenAttributesProtection)
-      attr_accessible :reputation_name, :value, :aggregated_by, :active, :target, :target_id, :target_type, :received_messages
-    end
+    attr_accessible :reputation_name, :value, :aggregated_by, :active, :target, :target_id, :target_type, :received_messages
 
     before_validation :set_target_type_for_sti
     before_save :change_zero_value_in_case_of_product_process
