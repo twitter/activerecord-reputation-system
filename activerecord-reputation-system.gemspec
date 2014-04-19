@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rdoc'
   s.add_development_dependency 'database_cleaner', "~>0.7.1"
   s.add_development_dependency 'sqlite3', "~>1.3.5"
+  a.add_development_dependency 'protected_attributes'
 
   s.require_path = 'lib'
   s.files = %w(LICENSE README.md Rakefile) + Dir.glob("{lib,spec}/**/*")
