@@ -14,6 +14,7 @@
 #  limitations under the License.
 ##
 
+require 'protected_attributes'
 require 'reputation_system/base'
 require 'reputation_system/query_methods'
 require 'reputation_system/finder_methods'

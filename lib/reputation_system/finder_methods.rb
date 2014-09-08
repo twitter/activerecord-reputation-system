@@ -53,8 +53,10 @@ module FinderMethods
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         if respond_to?(:construct_finder_sql, true)
           construct_finder_sql(options)
-        else
+        elsif respond_to?(:construct_finder_arel, true)
           construct_finder_arel(options).to_sql
+        else
+          joins(options[:joins]).select(options[:select]).where(options[:conditions]).send(find_scope).to_sql
         end
       end
 
