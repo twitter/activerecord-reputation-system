@@ -132,6 +132,10 @@ class User < ActiveRecord::Base
   has_reputation :answer_karma,
     :source => { :reputation => :weighted_avg_rating, :of => :answers },
     :aggregated_by => :average
+
+  def custom_process(rep, source, weight)
+    123
+  end
 end
 
 class Question < ActiveRecord::Base
@@ -161,6 +165,22 @@ class Answer < ActiveRecord::Base
   has_reputation :avg_rating,
     :source => :user,
     :aggregated_by => :average
+
+  has_reputation :custom_rating,
+    :source => :user,
+    :aggregated_by => :custom_aggregation
+
+  def custom_aggregation(*args)
+    rep, source, weight = args[0..2]
+    # rep, source, weight
+    if args.length === 3
+      rep.value + weight * source.value * 10
+    # rep, source, weight, oldValue, newSize
+    elsif args.length === 5
+      oldValue, newSize = args[3..4]
+      rep.value + (source.value - oldValue) * 10
+    end
+  end
 end
 
 class Phrase < ActiveRecord::Base

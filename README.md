@@ -91,6 +91,38 @@ You can get target records that have been evaluated by a given source record:
 Question.evaluated_by(:votes, @user) #=> [@question]
 ```
 
+You can use a custom aggregation function, which is a feature available on this fork, but not on the original implementation.
+You just need to provide the name of the method on the :aggregated_by option, and implement this method on the model.
+On the example below, our aggregation function sums all values and multiply by ten:
+```ruby
+class Answer < ActiveRecord::Base
+  belongs_to :author, :class_name => 'User'
+  belongs_to :question
+
+  has_reputation :custom_rating,
+    :source => :user,
+    :aggregated_by => :custom_aggregation
+
+  def custom_aggregation(*args)
+    rep, source, weight = args[0..2]
+    
+    # Ruby doesn't support method overloading, so let's handle parameters on a condition
+    
+    # For a new source, these are the input parameters:
+    # rep, source, weight
+    if args.length === 3
+      rep.value + weight * source.value * 10
+    
+    # For an updated source, these are the input parameters:
+    # rep, source, weight, oldValue, newSize
+    elsif args.length === 5
+      oldValue, newSize = args[3..4]
+      rep.value + (source.value - oldValue) * 10
+    end
+  end
+end
+```
+
 ## Documentation
 
 Please refer [Wiki](https://github.com/twitter/activerecord-reputation-system/wiki) for available APIs and more information.
