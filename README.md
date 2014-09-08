@@ -12,7 +12,8 @@ The Active Record Reputation System helps you build the reputation system for yo
 Add to Gemfile:
 
 ```ruby
-gem 'activerecord-reputation-system'
+gem 'activerecord-reputation-system', git: 'https://github.com/caiosba/activerecord-reputation-system.git',
+                                      branch: 'rails4', require: 'reputation_system'
 ```
 
 Run:
