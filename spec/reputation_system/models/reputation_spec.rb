@@ -46,6 +46,10 @@ describe ReputationSystem::Reputation do
       ReputationSystem::Reputation.create(:reputation_name => "karma3", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'product').should be_valid
     end
 
+    it "should be able to create reputation with custom process" do
+      ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'custom_process').should be_valid
+    end
+
     it "should not be able to create reputation with process other than 'sum', 'average' and 'product'" do
       ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'invalid').should_not be_valid
     end
@@ -131,6 +135,26 @@ describe ReputationSystem::Reputation do
       answer.reputation_for(:avg_rating).should be_within(DELTA).of(0)
       answer.add_evaluation(:avg_rating, 3, user1)
       answer.reputation_for(:avg_rating).should be_within(DELTA).of(3)
+    end
+  end
+
+  describe "custom aggregation function" do
+    it "should calculate based on a custom function for new source" do
+      user1 = User.create! :name => 'dick'
+      user2 = User.create! :name => 'katsuya'
+      answer = Answer.create!
+      answer.add_or_update_evaluation(:custom_rating, 3, user1)
+      answer.add_or_update_evaluation(:custom_rating, 2, user2)
+      answer.reputation_for(:custom_rating).should be_within(DELTA).of(50)
+    end
+
+    it "should calculate based on a custom function for updated source" do
+      user1 = User.create! :name => 'dick'
+      user2 = User.create! :name => 'katsuya'
+      answer = Answer.create!
+      answer.add_or_update_evaluation(:custom_rating, 3, user1)
+      answer.add_or_update_evaluation(:custom_rating, 2, user1)
+      answer.reputation_for(:custom_rating).should be_within(DELTA).of(20)
     end
   end
 end
