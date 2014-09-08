@@ -14,24 +14,12 @@
 #  limitations under the License.
 ##
 
-module ReputationSystem
-  module Scope
-    def self.included(klass)
-      klass.extend ClassMethods
-    end
+class AddEvaluationsIndex < ActiveRecord::Migration
+  def self.up
+    add_index :rs_evaluations, [:reputation_name, :source_id, :source_type, :target_id, :target_type], :name => "index_rs_evaluations_on_reputation_name_and_source_and_target"
+  end
 
-    module ClassMethods
-      def add_scope_for(reputation_name, scope)
-        ReputationSystem::Network.add_scope_for(name, reputation_name, scope)
-      end
-
-      def has_scopes?(reputation_name)
-        ReputationSystem::Network.has_scopes?(name, reputation_name, scope)
-      end
-
-      def has_scope?(reputation_name, scope)
-        ReputationSystem::Network.has_scope?(name, reputation_name, scope)
-      end
-    end
+  def self.down
+    remove_index :rs_evaluations, :name => "index_rs_evaluations_on_reputation_name_and_source_and_target"
   end
 end

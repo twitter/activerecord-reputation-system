@@ -16,7 +16,7 @@
 
 require 'spec_helper'
 
-describe ActiveRecord::Base do
+describe ReputationSystem::ReputationMethods do
 
   before(:each) do
     @user = User.create!(:name => 'jack')
@@ -26,28 +26,28 @@ describe ActiveRecord::Base do
   end
 
   context "Primary Reputation" do
-    describe "#reputation_value_for" do
+    describe "#reputation_for" do
       it "should return 0 as a default" do
-        @question.reputation_value_for(:total_votes).should == 0
+        @question.reputation_for(:total_votes).should == 0
       end
 
       it "should return appropriate value in case of valid input" do
         user2 = User.new(:name => 'dick')
         @question.add_evaluation(:total_votes, 1, @user)
         @question.add_evaluation(:total_votes, 1, user2)
-        @question.reputation_value_for(:total_votes).should == 2
+        @question.reputation_for(:total_votes).should == 2
       end
 
       it "should raise exception if invalid reputation name is given" do
-        lambda {@question.reputation_value_for(:invalid)}.should raise_error(ArgumentError)
+        lambda {@question.reputation_for(:invalid)}.should raise_error(ArgumentError)
       end
 
       it "should raise exception if scope is given for reputation with no scopes" do
-        lambda {@question.reputation_value_for(:difficulty, :s1)}.should raise_error(ArgumentError)
+        lambda {@question.reputation_for(:difficulty, :s1)}.should raise_error(ArgumentError)
       end
 
       it "should raise exception if scope is not given for reputation with scopes" do
-        lambda {@phrase.reputation_value_for(:difficulty_with_scope)}.should raise_error(ArgumentError)
+        lambda {@phrase.reputation_for(:difficulty_with_scope)}.should raise_error(ArgumentError)
       end
     end
 
@@ -83,20 +83,20 @@ describe ActiveRecord::Base do
   end
 
   context "Non-Primary Reputation with Gathering Aggregation" do
-    describe "#reputation_value_for" do
+    describe "#reputation_for" do
       it "should always have correct updated value" do
         question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
-        @user.reputation_value_for(:question_karma).should == 0
+        @user.reputation_for(:question_karma).should == 0
         @question.add_evaluation(:total_votes, 1, @user)
-        @user.reputation_value_for(:question_karma).should == 1
+        @user.reputation_for(:question_karma).should == 1
         question2.add_evaluation(:total_votes, 1, @user)
-        @user.reputation_value_for(:question_karma).should == 2
+        @user.reputation_for(:question_karma).should == 2
       end
     end
   end
 
   context "Non-Primary Reputation with Mixing Aggregation" do
-    describe "#reputation_value_for" do
+    describe "#reputation_for" do
       it "should always have correct updated value" do
         question = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
@@ -108,11 +108,54 @@ describe ActiveRecord::Base do
         answer2 = Answer.create!(:text => 'Yes!', :author_id => @user.id, :question_id => question2.id)
         answer.add_evaluation(:avg_rating, 3, @user)
         answer2.add_evaluation(:avg_rating, 2, @user)
-        answer.reputation_value_for(:weighted_avg_rating).should == 3
-        answer2.reputation_value_for(:weighted_avg_rating).should == 4
-        @user.reputation_value_for(:answer_karma).should be_within(DELTA).of(3.5)
-        @user.reputation_value_for(:question_karma).should be_within(DELTA).of(2)
-        @user.reputation_value_for(:karma).should be_within(DELTA).of(1.4)
+        answer.reputation_for(:weighted_avg_rating).should == 3
+        answer2.reputation_for(:weighted_avg_rating).should == 4
+        @user.reputation_for(:answer_karma).should be_within(DELTA).of(3.5)
+        @user.reputation_for(:question_karma).should be_within(DELTA).of(2)
+        @user.reputation_for(:karma).should be_within(DELTA).of(1.4)
+      end
+    end
+  end
+
+  context "Normalization" do
+    describe "#normalized_reputation_for" do
+      it "should return 0 as if there is no data" do
+        @question.normalized_reputation_for(:total_votes).should == 0
+      end
+
+      it "should return appropriate value in case of valid input" do
+        question2 = Question.create!(:text => 'Does this work too?', :author_id => @user.id)
+        question3 = Question.create!(:text => 'Does this work too?', :author_id => @user.id)
+        @question.add_evaluation(:total_votes, 1, @user)
+        question2.add_evaluation(:total_votes, 2, @user)
+        question3.add_evaluation(:total_votes, 3, @user)
+        @question.normalized_reputation_for(:total_votes).should == 0
+        question2.normalized_reputation_for(:total_votes).should == 0.5
+        question3.normalized_reputation_for(:total_votes).should == 1
+      end
+
+      it "should raise exception if invalid reputation name is given" do
+        lambda {@question.normalized_reputation_for(:invalid)}.should raise_error(ArgumentError)
+      end
+
+      it "should raise exception if scope is given for reputation with no scopes" do
+        lambda {@question.normalized_reputation_for(:difficulty, :s1)}.should raise_error(ArgumentError)
+      end
+
+      it "should raise exception if scope is not given for reputation with scopes" do
+        lambda {@phrase.normalized_reputation_for(:difficulty_with_scope)}.should raise_error(ArgumentError)
+      end
+    end
+
+    describe "#exclude_all_reputations_for_normalization" do
+      it "should activate all reputation" do
+        @question2 = Question.create!(:text => 'Does this work??', :author_id => @user.id)
+        @question2.add_evaluation(:total_votes, 70, @user)
+        @question.add_evaluation(:total_votes, 100, @user)
+        @question.deactivate_all_reputations
+        ReputationSystem::Reputation.maximum(:value, :conditions => {:reputation_name => 'total_votes', :active => true}).should == 70
+        @question.activate_all_reputations
+        ReputationSystem::Reputation.maximum(:value, :conditions => {:reputation_name => 'total_votes', :active => true}).should == 100
       end
     end
   end

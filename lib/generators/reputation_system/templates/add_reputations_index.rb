@@ -14,14 +14,12 @@
 #  limitations under the License.
 ##
 
-require 'spec_helper'
+class AddReputationsIndex < ActiveRecord::Migration
+  def self.up
+    add_index :rs_reputations, [:reputation_name, :target_id, :target_type], :name => "index_rs_reputations_on_reputation_name_and_target"
+  end
 
-describe ActiveRecord::Base do
-
-  before(:each) do
-    @user = User.create!(:name => 'jack')
-    @question = Question.create!(:text => 'Does this work?', :author_id => @user.id)
-    @answer = Answer.create!(:text => 'Yes!', :author_id => @user.id, :question_id => @question.id)
-    @phrase = Phrase.create!(:text => "One")
+  def self.down
+    remove_index :rs_reputations, :name => "index_rs_reputations_on_reputation_name_and_target"
   end
 end

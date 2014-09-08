@@ -15,14 +15,15 @@
 ##
 
 require 'reputation_system/base'
-require 'reputation_system/query'
-require 'reputation_system/normalization'
-require 'reputation_system/evaluation'
+require 'reputation_system/query_methods'
+require 'reputation_system/finder_methods'
+require 'reputation_system/query_builder'
+require 'reputation_system/evaluation_methods'
 require 'reputation_system/network'
-require 'reputation_system/reputation'
-require 'reputation_system/scope'
-require 'models/rs_evaluation'
-require 'models/rs_reputation'
-require 'models/rs_reputation_message'
+require 'reputation_system/reputation_methods'
+require 'reputation_system/scope_methods'
+require 'reputation_system/models/evaluation'
+require 'reputation_system/models/reputation'
+require 'reputation_system/models/reputation_message'
 
 ActiveRecord::Base.send(:include, ReputationSystem::Base)

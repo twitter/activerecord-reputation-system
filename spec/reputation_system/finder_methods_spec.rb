@@ -16,7 +16,7 @@
 
 require 'spec_helper'
 
-describe ActiveRecord::Base do
+describe ReputationSystem::FinderMethods do
 
   before(:each) do
     @user = User.create!(:name => 'jack')
@@ -170,13 +170,13 @@ describe ActiveRecord::Base do
       sql = Question.find_with_reputation_sql(:total_votes, :all, {
         :select => "questions.*, users.name AS user_name",
         :joins => "JOIN users ON questions.author_id = users.id",
-        :conditions => "total_votes > 0.6",
+        :conditions => "COALESCE(rs_reputations.value, 0) > 0.6",
         :order => "total_votes"})
       sql.should ==
         "SELECT questions.*, users.name AS user_name, COALESCE(rs_reputations.value, 0) AS total_votes "\
         "FROM \"questions\" JOIN users ON questions.author_id = users.id "\
         "LEFT JOIN rs_reputations ON questions.id = rs_reputations.target_id AND rs_reputations.target_type = 'Question' AND rs_reputations.reputation_name = 'total_votes' AND rs_reputations.active = 't' "\
-        "WHERE (total_votes > 0.6) "\
+        "WHERE (COALESCE(rs_reputations.value, 0) > 0.6) "\
         "ORDER BY total_votes"
     end
   end

@@ -18,8 +18,8 @@ module ReputationSystem
   class Network
     class << self
       def has_reputation_for?(class_name, reputation_name)
-        reputation_defs = get_reputation_defs(class_name)
-        reputation_defs[reputation_name.to_sym] && reputation_defs[reputation_name.to_sym][:source]
+        reputation_def = get_reputation_def(class_name, reputation_name)
+        !!reputation_def[:source]
       end
 
       def get_reputation_defs(class_name)
@@ -27,8 +27,22 @@ module ReputationSystem
       end
 
       def get_reputation_def(class_name, reputation_name)
-        reputation_defs = get_reputation_defs(class_name)
-        reputation_defs[reputation_name.to_sym] ||= {}
+        reputation_def = {}
+        unless class_name == "ActiveRecord::Base"
+          reputation_defs = get_reputation_defs(class_name)
+          reputation_defs[reputation_name.to_sym] ||= {}
+          reputation_def = reputation_defs[reputation_name.to_sym]
+          if reputation_def == {}
+            begin
+              # This recursion finds reputation definition in the ancestor in case of STI.
+              klass = class_name.constantize.superclass
+              reputation_def = get_reputation_def(klass.name, reputation_name) if klass
+            rescue NameError
+              # Class might have not been initialized yet at this point.
+            end
+          end
+        end
+        reputation_def
       end
 
       def add_reputation_def(class_name, reputation_name, options)
@@ -36,6 +50,7 @@ module ReputationSystem
         options[:source] = convert_to_array_if_hash(options[:source])
         options[:source_of] ||= []
         options[:source_of] = convert_to_array_if_hash(options[:source_of])
+        options[:aggregated_by] = options[:aggregated_by] || :sum
         assign_self_as_default_value_for_of_attr(options[:source])
         assign_self_as_default_value_for_of_attr(options[:source_of])
         reputation_defs[reputation_name] = options
@@ -82,6 +97,7 @@ module ReputationSystem
       end
 
       def get_scoped_reputation_name(class_name, reputation_name, scope)
+        raise ArgumentError, "#{reputation_name.to_s} is not defined for #{class_name}" unless has_reputation_for?(class_name, reputation_name)
         scope = scope.to_sym if scope
         validate_scope_necessity(class_name, reputation_name, scope)
         validate_scope_existence(class_name, reputation_name, scope)
@@ -92,13 +108,12 @@ module ReputationSystem
         source = get_reputation_def(target.class.name, reputation_name)[:source]
         if source.is_a?(Array)
           source.each do |s|
-            scope = target.evaluate_reputation_scope(s[:scope]) if s[:scope]
-            of = target.get_attributes_of(s)
-            srn = get_scoped_reputation_name((of.is_a?(Array) ? of[0] : of ).class.name, s[:reputation], scope)
-            source = s if srn.to_sym == source_name.to_sym
+            srn = get_scoped_reputation_name_from_source_def_and_target(s, target)
+            return s[:weight] if srn.to_sym == source_name.to_sym
           end
+        else
+          source[:weight]
         end
-        source[:weight]
       end
 
       protected
@@ -113,32 +128,42 @@ module ReputationSystem
 
         def create_scoped_reputation_def(class_name, reputation_name, scope, options)
           raise ArgumentError, "#{reputation_name} does not have scope." unless has_scopes?(class_name, reputation_name)
-          scope_options = {}
+          scope_options = options.reject { |k, v| ![:source, :aggregated_by].include? k }
           reputation_def = get_reputation_def(class_name, reputation_name)
-          if is_primary_reputation?(class_name, reputation_name)
-            scope_options[:source] = options[:source]
-          else
+          unless is_primary_reputation?(class_name, reputation_name)
             scope_options[:source] = []
-            reputation_def[:source].each do |s|
-              rep = {}
-              rep[:reputation] = s[:reputation]
-              # Passing "this" is not pretty but in some case "instance_exec" method
-              # does not give right context for some reason.
-              # This could be ruby bug. Needs further investigation.
-              rep[:of] = lambda { |this| instance_exec(this, scope.to_s, &s[:of]) } if s[:of].is_a? Proc
-              scope_options[:source].push rep
-            end
+            reputation_def[:source].each { |sd| scope_options[:source].push create_source_reputation_def(sd, scope) }
           end
-          source_of = reputation_def[:source_of]
-          source_of.each do |so|
-            if so[:defined_for_scope].nil? || (so[:defined_for_scope] && so[:defined_for_scope].include?(scope.to_sym))
+          (reputation_def[:source_of] || []).each do |so|
+            if source_of_defined_for_scope?(so, scope)
               scope_options[:source_of] ||= []
               scope_options[:source_of].push so
             end
-          end if source_of
-          scope_options[:aggregated_by] = options[:aggregated_by]
+          end
           srn = get_scoped_reputation_name(class_name, reputation_name, scope)
           network[class_name.to_sym][srn.to_sym] = scope_options
+        end
+
+        def create_source_reputation_def(source_def, scope)
+          rep = {}
+          rep[:reputation] = source_def[:reputation]
+          # Passing "this" is not pretty but in some case "instance_exec" method
+          # does not give right context for some reason.
+          # This could be ruby bug. Needs further investigation.
+          rep[:of] = lambda { |this| instance_exec(this, scope.to_s, &source_def[:of]) } if source_def[:of].is_a? Proc
+          rep
+        end
+
+        def get_scoped_reputation_name_from_source_def_and_target(source_def, target)
+          scope = target.evaluate_reputation_scope(source_def[:scope]) if source_def[:scope]
+          of = target.get_attributes_of(source_def)
+          class_name = (of.is_a?(Array) ? of[0] : of).class.name
+          get_scoped_reputation_name(class_name, source_def[:reputation], scope)
+        end
+
+        def source_of_defined_for_scope?(source_of_def, scope)
+          defined_for_scope = source_of_def[:defined_for_scope]
+          defined_for_scope.nil? || (defined_for_scope && defined_for_scope.include?(scope.to_sym))
         end
 
         def construct_scoped_reputation_options(class_name, reputation_name, options)
@@ -149,18 +174,34 @@ module ReputationSystem
         end
 
         def derive_source_of_from_source(class_name, reputation_name, source, src_class_name)
-          if source[:of] && source[:of].is_a?(Symbol) && source[:of] != :self
-            klass = src_class_name.to_s.constantize
-            of_value = class_name.tableize
-            of_value = of_value.chomp('s') unless klass.instance_methods.include?(of_value.to_s) || klass.instance_methods.include?(of_value.to_sym)
-          else
-            of_value = "self"
-          end
+          of_value = derive_of_value(class_name, source[:of], src_class_name)
           reputation_def = get_reputation_def(src_class_name, source[:reputation])
           reputation_def[:source_of] ||= []
-          unless reputation_def[:source_of].any? {|elem| elem[:reputation] == reputation_name.to_sym}
+          unless source_of_include_reputation?(reputation_def[:source_of], reputation_name)
             reputation_def[:source_of] << {:reputation => reputation_name.to_sym, :of => of_value.to_sym}
           end
+        end
+
+        def derive_of_value(class_name, source_of, src_class_name)
+          if not_source_of_self?(source_of)
+            attr = class_name.tableize
+            class_has_attribute?(src_class_name, attr) ? attr :  attr.chomp('s')
+          else
+            "self"
+          end
+        end
+
+        def not_source_of_self?(source_of)
+          source_of && source_of.is_a?(Symbol) && source_of != :self
+        end
+
+        def class_has_attribute?(class_name, attribute)
+          klass = class_name.to_s.constantize
+          klass.instance_methods.include?(attribute.to_s) || klass.instance_methods.include?(attribute.to_sym)
+        end
+
+        def source_of_include_reputation?(source_of, reputation_name)
+          source_of.map { |rep| rep[:reputation] }.include?(reputation_name.to_sym)
         end
 
         def derive_source_of_from_source_later(class_name, reputation_name, source, src_class_name)

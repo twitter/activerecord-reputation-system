@@ -15,5 +15,23 @@
 ##
 
 module ReputationSystem
-  VERSION = "2.0.2"
+  module ScopeMethods
+    def self.included(klass)
+      klass.extend ClassMethods
+    end
+
+    module ClassMethods
+      def add_scope_for(reputation_name, scope)
+        ReputationSystem::Network.add_scope_for(name, reputation_name, scope)
+      end
+
+      def has_scopes?(reputation_name)
+        ReputationSystem::Network.has_scopes?(name, reputation_name, scope)
+      end
+
+      def has_scope?(reputation_name, scope)
+        ReputationSystem::Network.has_scope?(name, reputation_name, scope)
+      end
+    end
+  end
 end

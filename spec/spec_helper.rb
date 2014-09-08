@@ -102,6 +102,17 @@ ActiveRecord::Schema.define do
     t.string  :locale
     t.timestamps
   end
+
+  create_table :people do |t|
+    t.string :name
+    t.string :type
+    t.timestamps
+  end
+
+  create_table :posts do |t|
+    t.string :name
+    t.timestamps
+  end
 end
 
 class User < ActiveRecord::Base
@@ -110,16 +121,16 @@ class User < ActiveRecord::Base
 
   has_reputation :karma,
     :source => [
-      {:reputation => :question_karma},
-      {:reputation => :answer_karma, :weight => 0.2}],
+      { :reputation => :question_karma },
+      { :reputation => :answer_karma, :weight => 0.2 }],
     :aggregated_by => :product
 
   has_reputation :question_karma,
-    :source => {:reputation => :total_votes, :of => :questions},
+    :source => { :reputation => :total_votes, :of => :questions },
     :aggregated_by => :sum
 
   has_reputation :answer_karma,
-    :source => {:reputation => :weighted_avg_rating, :of => :answers},
+    :source => { :reputation => :weighted_avg_rating, :of => :answers },
     :aggregated_by => :average
 end
 
@@ -129,8 +140,7 @@ class Question < ActiveRecord::Base
 
   has_reputation :total_votes,
     :source => :user,
-    :aggregated_by => :sum,
-    :source_of => {:reputation => :question_karma, :of => :author}
+    :source_of => { :reputation => :question_karma, :of => :author }
 
   has_reputation :difficulty,
     :source => :user,
@@ -143,15 +153,14 @@ class Answer < ActiveRecord::Base
 
   has_reputation :weighted_avg_rating,
     :source => [
-      {:reputation => :avg_rating},
-      {:reputation => :difficulty, :of => :question}],
+      { :reputation => :avg_rating },
+      { :reputation => :difficulty, :of => :question }],
     :aggregated_by => :product,
-    :source_of => {:reputation => :answer_karma, :of => :author}
+    :source_of => { :reputation => :answer_karma, :of => :author }
 
   has_reputation :avg_rating,
     :source => :user,
-    :aggregated_by => :average,
-    :init_value => 1
+    :aggregated_by => :average
 end
 
 class Phrase < ActiveRecord::Base
@@ -163,15 +172,15 @@ class Phrase < ActiveRecord::Base
 
   has_reputation :maturity_all,
     :source => [
-      {:reputation => :maturity, :of => :self, :scope => :ja},
-      {:reputation => :maturity, :of => :self, :scope => :fr}],
+      { :reputation => :maturity, :of => :self, :scope => :ja },
+      { :reputation => :maturity, :of => :self, :scope => :fr }],
     :aggregated_by => :sum
 
   has_reputation :maturity,
     :source => { :reputation => :votes, :of => lambda {|this, s| this.translations.for(s)} },
     :aggregated_by => :sum,
     :scopes => [:ja, :fr, :de],
-    :source_of => {:reputation => :maturity_all, :of => :self, :defined_for_scope => [:ja, :fr]}
+    :source_of => { :reputation => :maturity_all, :of => :self, :defined_for_scope => [:ja, :fr] }
 
   has_reputation :difficulty_with_scope,
     :source => :user,
@@ -186,5 +195,26 @@ class Translation < ActiveRecord::Base
   has_reputation :votes,
     :source => :user,
     :aggregated_by => :sum,
-    :source_of => {:reputation => :maturity, :of => :phrase, :scope => :locale}
+    :source_of => { :reputation => :maturity, :of => :phrase, :scope => :locale}
+end
+
+# For STI Specs
+
+class Person < ActiveRecord::Base
+  has_reputation :leadership,
+    :source => :person,
+    :aggregated_by => :sum
+end
+
+class Programmer < Person
+end
+
+class Designer < Person
+end
+
+class Post < ActiveRecord::Base
+  belongs_to :person
+
+  has_reputation :votes,
+    :source => :person
 end

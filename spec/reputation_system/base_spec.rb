@@ -16,7 +16,7 @@
 
 require 'spec_helper'
 
-describe ActiveRecord::Base do
+describe ReputationSystem::Base do
 
   before(:each) do
     @user = User.create!(:name => 'jack')
@@ -36,32 +36,67 @@ describe ActiveRecord::Base do
         @user.respond_to?(:add_evaluation).should == false
       end
 
-      it "should add 'reputation_value_for' method to a model with reputation" do
-        @user.respond_to?(:reputation_value_for).should == true
-        @question.respond_to?(:reputation_value_for).should == true
+      it "should add 'reputation_for' method to a model with reputation" do
+        @user.respond_to?(:reputation_for).should == true
+        @question.respond_to?(:reputation_for).should == true
       end
 
-      it "should add 'normalized_reputation_value_for' method to a model with reputation" do
-        @user.respond_to?(:normalized_reputation_value_for).should == true
-        @question.respond_to?(:normalized_reputation_value_for).should == true
+      it "should add 'normalized_reputation_for' method to a model with reputation" do
+        @user.respond_to?(:normalized_reputation_for).should == true
+        @question.respond_to?(:normalized_reputation_for).should == true
       end
 
       it "should delete reputations if target is deleted" do
         @question.add_evaluation(:total_votes, 5, @user)
-        reputation_count = RSReputation.count
-        message_count = RSReputationMessage.count
+        reputation_count = ReputationSystem::Reputation.count
+        message_count = ReputationSystem::ReputationMessage.count
         @question.destroy
-        RSReputation.count.should < reputation_count
-        RSReputationMessage.count.should < message_count
+        ReputationSystem::Reputation.count.should < reputation_count
+        ReputationSystem::ReputationMessage.count.should < message_count
       end
+    end
+  end
 
-      it "should have declared default value if any" do
-        @answer.reputation_value_for(:avg_rating).should == 1
+  context "Association" do
+    describe "#reputations" do
+      it "should define reputations association" do
+        @question.respond_to?(:reputations).should == true
       end
+      it "should return all reputations for the target" do
+        @question.add_evaluation(:total_votes, 2, @user)
+        @question.add_evaluation(:difficulty, 2, @user)
+        @question.reputations.count.should == 2
+      end
+      describe "#for" do
+        it "should return empty array if there is no reputation for the target" do
+          @question.reputations.for(:total_votes).should == []
+        end
+        it "should return all reputations of the given type for the target" do
+          @question.add_evaluation(:total_votes, 2, @user)
+          @question.add_evaluation(:difficulty, 2, @user)
+          @question.reputations.for(:total_votes).count.should == 1
+        end
+      end
+    end
 
-      it "should overwrite reputation definitions if the same reputation name is declared" do
-        Answer.has_reputation(:avg_rating, :source => :user, :aggregated_by => :average, :init_value => 2)
-        Answer.new.reputation_value_for(:avg_rating).should == 2
+    describe "#evaluations" do
+      it "should define evaluations association" do
+        @question.respond_to?(:evaluations).should == true
+      end
+      it "should return all evaluations for the target" do
+        @question.add_evaluation(:total_votes, 2, @user)
+        @question.add_evaluation(:difficulty, 2, @user)
+        @question.evaluations.count.should == 2
+      end
+      describe "#for" do
+        it "should return empty array if there is no evaluation for the target" do
+          @question.evaluations.for(:total_votes).should == []
+        end
+        it "should return all evaluations of the given type for the target" do
+          @question.add_evaluation(:total_votes, 2, @user)
+          @question.add_evaluation(:difficulty, 2, @user)
+          @question.evaluations.for(:total_votes).count.should == 1
+        end
       end
     end
   end
