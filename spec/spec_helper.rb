@@ -133,7 +133,11 @@ class User < ActiveRecord::Base
     :source => { :reputation => :weighted_avg_rating, :of => :answers },
     :aggregated_by => :average
 
-  def custom_process(rep, source, weight)
+  has_reputation :custom_rating,
+    :source => { :reputation => :custom_rating, :of => :answers },
+    :aggregated_by => :custom_rating
+
+  def custom_process
     123
   end
 end
@@ -168,7 +172,8 @@ class Answer < ActiveRecord::Base
 
   has_reputation :custom_rating,
     :source => :user,
-    :aggregated_by => :custom_aggregation
+    :aggregated_by => :custom_aggregation,
+    :source_of => { :reputation => :custom_rating, :of => :author }
 
   def custom_aggregation(*args)
     rep, source, weight = args[0..2]
