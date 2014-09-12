@@ -31,12 +31,6 @@ module ReputationSystem
     before_validation :set_target_type_for_sti
     before_save :change_zero_value_in_case_of_product_process
 
-    VALID_PROCESSES = ['sum', 'average', 'product']
-    validates_inclusion_of :aggregated_by, :in => VALID_PROCESSES, :message => "Value chosen for aggregated_by is not valid process",
-                           :if => lambda { |model|
-                                    !model.target.respond_to?(model.aggregated_by) &&
-                                    !VALID_PROCESSES.include?(model.aggregated_by)
-                                  }
     validates_uniqueness_of :reputation_name, :scope => [:target_id, :target_type]
 
     def self.find_by_reputation_name_and_target(reputation_name, target)

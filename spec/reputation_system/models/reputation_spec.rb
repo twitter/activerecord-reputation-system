@@ -50,8 +50,8 @@ describe ReputationSystem::Reputation do
       ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'custom_process').should be_valid
     end
 
-    it "should not be able to create reputation with process other than 'sum', 'average' and 'product'" do
-      ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'invalid').should_not be_valid
+   it "should be able to create reputation with custom process from source" do
+      ReputationSystem::Reputation.create(:reputation_name => "custom_rating", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'custom_rating').should be_valid
     end
 
     it "should not be able to create reputation of the same name for the same target" do
