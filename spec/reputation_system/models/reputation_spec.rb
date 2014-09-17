@@ -157,4 +157,11 @@ describe ReputationSystem::Reputation do
       answer.reputation_for(:custom_rating).should be_within(DELTA).of(20)
     end
   end
+
+  describe "additional data" do
+    it "should have data as a serialized field" do
+      r = ReputationSystem::Reputation.create!(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum')
+      r.data.should be_a(Hash)
+    end
+  end
 end

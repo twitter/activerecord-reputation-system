@@ -56,6 +56,7 @@ ActiveRecord::Schema.define do
     t.string      :aggregated_by
     t.references  :target, :polymorphic => true
     t.boolean     :active, :default => true
+    t.text        :data
     t.timestamps
   end
 
