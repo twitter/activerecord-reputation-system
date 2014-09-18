@@ -31,6 +31,8 @@ module ReputationSystem
     validates_uniqueness_of :source_id, :scope => [:reputation_name, :source_type, :target_id, :target_type]
     validate :source_must_be_defined_for_reputation_in_network
 
+    serialize :data, Hash
+
     def self.find_by_reputation_name_and_source_and_target(reputation_name, source, target)
       source_type = get_source_type_for_sti(source.class.name, target.class.name, reputation_name)
       ReputationSystem::Evaluation.where(

@@ -59,4 +59,12 @@ describe ReputationSystem::Evaluation do
       ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name).should be_nil
     end
   end
+
+  context "Additional Data" do
+    it "should have data as a serialized field" do
+      @attributes = {:reputation_name => 'total_votes', :source => @user, :target => @question, :value => 1}
+      e = ReputationSystem::Evaluation.create!(@attributes)
+      e.data.should be_a(Hash)
+    end
+  end
 end

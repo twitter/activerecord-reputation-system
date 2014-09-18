@@ -43,6 +43,7 @@ ActiveRecord::Schema.define do
     t.references  :source, :polymorphic => true
     t.references  :target, :polymorphic => true
     t.float       :value, :default => 0
+    t.text        :data
     t.timestamps
   end
 

@@ -38,6 +38,7 @@ class ReputationSystemGenerator < Rails::Generators::Base
     create_migration_file_if_not_exist 'change_reputation_messages_index_to_unique'
     create_migration_file_if_not_exist 'change_reputations_index_to_unique'
     create_migration_file_if_not_exist 'add_data_to_reputations'
+    create_migration_file_if_not_exist 'add_data_to_evaluations'
   end
 
   private
