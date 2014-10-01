@@ -25,21 +25,21 @@ module ReputationSystem
     end
 
     def activate_all_reputations
-      ReputationSystem::Reputation.find(:all, :conditions => {:target_id => self.id, :target_type => self.class.name, :active => false}).each do |r|
+      ReputationSystem::Reputation.where(:target_id => self.id, :target_type => self.class.name, :active => false).each do |r|
         r.active = true
         r.save!
       end
     end
 
     def deactivate_all_reputations
-      ReputationSystem::Reputation.find(:all, :conditions => {:target_id => self.id, :target_type => self.class.name, :active => true}).each do |r|
+      ReputationSystem::Reputation.where(:target_id => self.id, :target_type => self.class.name, :active => true).each do |r|
         r.active = false
         r.save!
       end
     end
 
     def reputations_activated?(reputation_name)
-      r = ReputationSystem::Reputation.find(:first, :conditions => {:reputation_name => reputation_name.to_s, :target_id => self.id, :target_type => self.class.name})
+      r = ReputationSystem::Reputation.where(:reputation_name => reputation_name.to_s, :target_id => self.id, :target_type => self.class.name).first
       r ? r.active : false
     end
 

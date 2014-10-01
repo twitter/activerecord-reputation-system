@@ -166,7 +166,7 @@ end
 class Phrase < ActiveRecord::Base
   has_many :translations do
     def for(locale)
-      self.find_all_by_locale(locale.to_s)
+      self.where(:locale => locale.to_s).to_a
     end
   end
 

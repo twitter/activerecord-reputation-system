@@ -22,7 +22,9 @@ module ReputationSystem
     belongs_to :target, :polymorphic => true
     has_one :sent_messages, :as => :sender, :class_name => 'ReputationSystem::ReputationMessage', :dependent => :destroy
 
-    attr_accessible :reputation_name, :value, :source, :source_id, :source_type, :target, :target_id, :target_type
+    unless defined?(ActiveModel::ForbiddenAttributesProtection)
+      attr_accessible :reputation_name, :value, :source, :source_id, :source_type, :target, :target_id, :target_type
+    end
 
     # Sets an appropriate source type in case of Single Table Inheritance.
     before_validation :set_source_type_for_sti
@@ -33,13 +35,13 @@ module ReputationSystem
 
     def self.find_by_reputation_name_and_source_and_target(reputation_name, source, target)
       source_type = get_source_type_for_sti(source.class.name, target.class.name, reputation_name)
-      ReputationSystem::Evaluation.find(:first,
-                        :conditions => {:reputation_name => reputation_name.to_s,
-                                        :source_id => source.id,
-                                        :source_type => source_type,
-                                        :target_id => target.id,
-                                        :target_type => target.class.name
-                                        })
+      ReputationSystem::Evaluation.where(
+        :reputation_name => reputation_name.to_s,
+        :source_id => source.id,
+        :source_type => source_type,
+        :target_id => target.id,
+        :target_type => target.class.name
+      ).first
     end
 
     def self.create_evaluation(reputation_name, value, source, target)

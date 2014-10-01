@@ -27,7 +27,7 @@ module FinderMethods
         options[:select] = build_select_statement(table_name, reputation_name, options[:select])
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
-        find(find_scope, options)
+        joins(options[:joins]).select(options[:select]).where(options[:conditions]).send(find_scope)
       end
 
       def count_with_reputation(*args)
@@ -35,7 +35,7 @@ module FinderMethods
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         options[:conditions][0].gsub!(reputation_name.to_s, "COALESCE(rs_reputations.value, 0)")
-        count(find_scope, options)
+        joins(options[:joins]).select(options[:select]).where(options[:conditions]).send(find_scope).count
       end
 
       def find_with_normalized_reputation(*args)
@@ -43,7 +43,7 @@ module FinderMethods
         options[:select] = build_select_statement(table_name, reputation_name, options[:select], srn, true)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions], srn, true)
-        find(find_scope, options)
+        joins(options[:joins]).select(options[:select]).where(options[:conditions]).send(find_scope)
       end
 
       def find_with_reputation_sql(*args)

@@ -22,7 +22,8 @@ module ReputationSystem
 
     def get_attributes_of(reputation)
       of = reputation[:of]
-      attrs = reputation[:of] == :self ? self : self.instance_eval(of.to_s) if of.is_a?(String) || of.is_a?(Symbol)
+      attrs = (of == :self) ? self : self.instance_eval(of.to_s) if of.is_a?(String) || of.is_a?(Symbol)
+      attrs = attrs.to_a if attrs.is_a?(ActiveRecord::Associations::CollectionProxy)
       attrs = self.instance_exec(self, &of) if of.is_a?(Proc)
       attrs = [attrs] unless attrs.is_a? Array
       attrs.compact

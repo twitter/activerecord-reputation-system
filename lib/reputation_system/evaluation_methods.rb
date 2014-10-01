@@ -25,7 +25,7 @@ module ReputationSystem
         options[:select] ||= sanitize_sql_array(["%s.*", self.table_name])
         options[:joins] = sanitize_sql_array(["JOIN rs_evaluations ON %s.id = rs_evaluations.target_id AND rs_evaluations.target_type = ? AND rs_evaluations.reputation_name = ? AND rs_evaluations.source_id = ? AND rs_evaluations.source_type = ?", self.name, srn.to_s, source.id, source_type])
         options[:joins] = sanitize_sql_array([options[:joins], self.table_name])
-        find(:all, options) 
+        joins(options[:joins]).select(options[:select])
       end
     end
 
