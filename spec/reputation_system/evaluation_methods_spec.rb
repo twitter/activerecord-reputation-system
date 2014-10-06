@@ -30,20 +30,20 @@ describe ReputationSystem::EvaluationMethods do
       it "should return false if it has not already been evaluated by a given source" do
         user = User.create! :name => 'katsuya'
         @question.add_evaluation(:total_votes, 3, user)
-        @question.has_evaluation?(:total_votes, @user).should be_false
+        @question.has_evaluation?(:total_votes, @user).should be false
       end
       it "should return true if it has been evaluated by a given source" do
         @question.add_evaluation(:total_votes, 3, @user)
-        @question.has_evaluation?(:total_votes, @user).should be_true
+        @question.has_evaluation?(:total_votes, @user).should be true
       end
       context "With Scopes" do
         it "should return false if it has not already been evaluated by a given source" do
           @phrase.add_evaluation(:difficulty_with_scope, 3, @user, :s1)
-          @phrase.has_evaluation?(:difficulty_with_scope, @user, :s2).should be_false
+          @phrase.has_evaluation?(:difficulty_with_scope, @user, :s2).should be false
         end
         it "should return true if it has been evaluated by a given source" do
           @phrase.add_evaluation(:difficulty_with_scope, 3, @user, :s1)
-          @phrase.has_evaluation?(:difficulty_with_scope, @user, :s1).should be_true
+          @phrase.has_evaluation?(:difficulty_with_scope, @user, :s1).should be true
         end
       end
     end
@@ -57,9 +57,9 @@ describe ReputationSystem::EvaluationMethods do
         user2 = User.create!(:name => 'katsuya')
         question2 = Question.create!(:text => 'Question 2', :author_id => @user.id)
         question3 = Question.create!(:text => 'Question 3', :author_id => @user.id)
-        @question.add_evaluation(:total_votes, 1, @user).should be_true
-        question2.add_evaluation(:total_votes, 2, user2).should be_true
-        question3.add_evaluation(:total_votes, 3, @user).should be_true
+        @question.add_evaluation(:total_votes, 1, @user).should be true
+        question2.add_evaluation(:total_votes, 2, user2).should be true
+        question3.add_evaluation(:total_votes, 3, @user).should be true
         Question.evaluated_by(:total_votes, @user).should == [@question, question3]
         Question.evaluated_by(:total_votes, user2).should == [question2]
       end
@@ -68,14 +68,14 @@ describe ReputationSystem::EvaluationMethods do
         it "should return an array of targets evaluated by a given source on appropriate scope" do
           user2 = User.create!(:name => 'katsuya')
           phrase2 = Phrase.create!(:text => "Two")
-          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
-          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
-          @phrase.add_evaluation(:difficulty_with_scope, 3, user2, :s2).should be_true
-          @phrase.add_evaluation(:difficulty_with_scope, 4, user2, :s3).should be_true
-          phrase2.add_evaluation(:difficulty_with_scope, 1, user2, :s1).should be_true
-          phrase2.add_evaluation(:difficulty_with_scope, 2, user2, :s2).should be_true
-          phrase2.add_evaluation(:difficulty_with_scope, 3, @user, :s2).should be_true
-          phrase2.add_evaluation(:difficulty_with_scope, 4, @user, :s3).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be true
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be true
+          @phrase.add_evaluation(:difficulty_with_scope, 3, user2, :s2).should be true
+          @phrase.add_evaluation(:difficulty_with_scope, 4, user2, :s3).should be true
+          phrase2.add_evaluation(:difficulty_with_scope, 1, user2, :s1).should be true
+          phrase2.add_evaluation(:difficulty_with_scope, 2, user2, :s2).should be true
+          phrase2.add_evaluation(:difficulty_with_scope, 3, @user, :s2).should be true
+          phrase2.add_evaluation(:difficulty_with_scope, 4, @user, :s3).should be true
           Phrase.evaluated_by(:difficulty_with_scope, @user, :s1).should == [@phrase]
           Phrase.evaluated_by(:difficulty_with_scope, user2, :s1).should == [phrase2]
           Phrase.evaluated_by(:difficulty_with_scope, @user, :s2).should == [@phrase, phrase2]
@@ -94,9 +94,9 @@ describe ReputationSystem::EvaluationMethods do
       it "should return an array of sources evaluated the target" do
         user2 = User.create!(:name => 'katsuya')
         question2 = Question.create!(:text => 'Question 2', :author_id => @user.id)
-        @question.add_evaluation(:total_votes, 1, @user).should be_true
-        question2.add_evaluation(:total_votes, 1, @user).should be_true
-        question2.add_evaluation(:total_votes, 2, user2).should be_true
+        @question.add_evaluation(:total_votes, 1, @user).should be true
+        question2.add_evaluation(:total_votes, 1, @user).should be true
+        question2.add_evaluation(:total_votes, 2, user2).should be true
         @question.evaluators_for(:total_votes).should == [@user]
         question2.evaluators_for(:total_votes).should == [@user, user2]
       end
@@ -104,10 +104,10 @@ describe ReputationSystem::EvaluationMethods do
       context "With Scopes" do
         it "should return an array of targets evaluated by a given source on appropriate scope" do
           user2 = User.create!(:name => 'katsuya')
-          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
-          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
-          @phrase.add_evaluation(:difficulty_with_scope, 3, user2, :s2).should be_true
-          @phrase.add_evaluation(:difficulty_with_scope, 4, user2, :s3).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be true
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be true
+          @phrase.add_evaluation(:difficulty_with_scope, 3, user2, :s2).should be true
+          @phrase.add_evaluation(:difficulty_with_scope, 4, user2, :s3).should be true
           @phrase.evaluators_for(:difficulty_with_scope, :s1).should == [@user]
           @phrase.evaluators_for(:difficulty_with_scope, :s2).should == [@user, user2]
           @phrase.evaluators_for(:difficulty_with_scope, :s3).should == [user2]
@@ -117,7 +117,7 @@ describe ReputationSystem::EvaluationMethods do
 
     describe "#add_evaluation" do
       it "should create evaluation in case of valid input" do
-        @question.add_evaluation(:total_votes, 1, @user).should be_true
+        @question.add_evaluation(:total_votes, 1, @user).should be true
         @question.reputation_for(:total_votes).should == 1
       end
 
@@ -142,8 +142,8 @@ describe ReputationSystem::EvaluationMethods do
 
       context "with scopes" do
         it "should add evaluation on appropriate scope" do
-          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
-          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be true
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be true
           @phrase.reputation_for(:difficulty_with_scope, :s1).should == 1
           @phrase.reputation_for(:difficulty_with_scope, :s2).should == 2
           @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
@@ -161,30 +161,30 @@ describe ReputationSystem::EvaluationMethods do
 
     describe "#add_or_update_evaluation" do
       it "should create evaluation if it does not exist" do
-        @question.add_or_update_evaluation(:total_votes, 1, @user).should be_true
+        @question.add_or_update_evaluation(:total_votes, 1, @user).should be true
         @question.reputation_for(:total_votes).should == 1
       end
 
       it "should update evaluation if it exists already" do
         @question.add_evaluation(:total_votes, 1, @user)
-        @question.add_or_update_evaluation(:total_votes, 2, @user).should be_true
+        @question.add_or_update_evaluation(:total_votes, 2, @user).should be true
         @question.reputation_for(:total_votes).should == 2
       end
 
       context "with scopes" do
         it "should add evaluation on appropriate scope if it does not exist" do
-          @phrase.add_or_update_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
-          @phrase.add_or_update_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
+          @phrase.add_or_update_evaluation(:difficulty_with_scope, 1, @user, :s1).should be true
+          @phrase.add_or_update_evaluation(:difficulty_with_scope, 2, @user, :s2).should be true
           @phrase.reputation_for(:difficulty_with_scope, :s1).should == 1
           @phrase.reputation_for(:difficulty_with_scope, :s2).should == 2
           @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
         end
 
         it "should update evaluation on appropriate scope if it exists already" do
-          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be_true
-          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
-          @phrase.add_or_update_evaluation(:difficulty_with_scope, 3, @user, :s1).should be_true
-          @phrase.add_or_update_evaluation(:difficulty_with_scope, 5, @user, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1).should be true
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be true
+          @phrase.add_or_update_evaluation(:difficulty_with_scope, 3, @user, :s1).should be true
+          @phrase.add_or_update_evaluation(:difficulty_with_scope, 5, @user, :s2).should be true
           @phrase.reputation_for(:difficulty_with_scope, :s1).should == 3
           @phrase.reputation_for(:difficulty_with_scope, :s2).should == 5
           @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
@@ -208,7 +208,7 @@ describe ReputationSystem::EvaluationMethods do
       end
 
       it "should update evaluation in case of valid input" do
-        @question.update_evaluation(:total_votes, 2, @user).should be_true
+        @question.update_evaluation(:total_votes, 2, @user).should be true
         @question.reputation_for(:total_votes).should == 2
       end
 
@@ -226,11 +226,11 @@ describe ReputationSystem::EvaluationMethods do
 
       context "With Scopes" do
         before :each do
-          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be_true
+          @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2).should be true
         end
 
         it "should update evaluation on appropriate scope" do
-          @phrase.update_evaluation(:difficulty_with_scope, 5, @user, :s2).should be_true
+          @phrase.update_evaluation(:difficulty_with_scope, 5, @user, :s2).should be true
           @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
           @phrase.reputation_for(:difficulty_with_scope, :s2).should == 5
           @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
@@ -296,7 +296,7 @@ describe ReputationSystem::EvaluationMethods do
       end
 
       it "should delete evaluation in case of valid input" do
-        @question.delete_evaluation(:total_votes, @user).should be_true
+        @question.delete_evaluation(:total_votes, @user).should be true
         @question.reputation_for(:total_votes).should == 0
       end
 
@@ -305,7 +305,7 @@ describe ReputationSystem::EvaluationMethods do
       end
 
       it "should return false if evaluation does not exist" do
-        @answer.delete_evaluation(:avg_rating, @user).should be_false
+        @answer.delete_evaluation(:avg_rating, @user).should be false
       end
 
       context "With Scopes" do
@@ -314,7 +314,7 @@ describe ReputationSystem::EvaluationMethods do
         end
 
         it "should delete evaluation on appropriate scope" do
-          @phrase.delete_evaluation(:difficulty_with_scope, @user, :s2).should be_true
+          @phrase.delete_evaluation(:difficulty_with_scope, @user, :s2).should be true
           @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
           @phrase.reputation_for(:difficulty_with_scope, :s2).should == 0
           @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
@@ -332,13 +332,13 @@ describe ReputationSystem::EvaluationMethods do
 
     describe "#increase_evaluation" do
       it "should add evaluation if it does not exist" do
-        @question.increase_evaluation(:total_votes, 2, @user).should be_true
+        @question.increase_evaluation(:total_votes, 2, @user).should be true
         @question.reputation_for(:total_votes).should == 2
       end
 
       it "should increase evaluation if it exists already" do
         @question.add_evaluation(:total_votes, 1, @user)
-        @question.increase_evaluation(:total_votes, 2, @user).should be_true
+        @question.increase_evaluation(:total_votes, 2, @user).should be true
         @question.reputation_for(:total_votes).should == 3
       end
 
@@ -348,7 +348,7 @@ describe ReputationSystem::EvaluationMethods do
         end
 
         it "should increase evaluation on appropriate scope" do
-          @phrase.increase_evaluation(:difficulty_with_scope, 5, @user, :s2).should be_true
+          @phrase.increase_evaluation(:difficulty_with_scope, 5, @user, :s2).should be true
           @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
           @phrase.reputation_for(:difficulty_with_scope, :s2).should == 7
           @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
@@ -358,13 +358,13 @@ describe ReputationSystem::EvaluationMethods do
 
     describe "#decrease_evaluation" do
       it "should add evaluation if it does not exist" do
-        @question.decrease_evaluation(:total_votes, 2, @user).should be_true
+        @question.decrease_evaluation(:total_votes, 2, @user).should be true
         @question.reputation_for(:total_votes).should == -2
       end
 
       it "should increase evaluation if it exists already" do
         @question.add_evaluation(:total_votes, 1, @user)
-        @question.decrease_evaluation(:total_votes, 2, @user).should be_true
+        @question.decrease_evaluation(:total_votes, 2, @user).should be true
         @question.reputation_for(:total_votes).should == -1
       end
 
@@ -374,7 +374,7 @@ describe ReputationSystem::EvaluationMethods do
         end
 
         it "should decrease evaluation on appropriate scope" do
-          @phrase.decrease_evaluation(:difficulty_with_scope, 5, @user, :s2).should be_true
+          @phrase.decrease_evaluation(:difficulty_with_scope, 5, @user, :s2).should be true
           @phrase.reputation_for(:difficulty_with_scope, :s1).should == 0
           @phrase.reputation_for(:difficulty_with_scope, :s2).should == -3
           @phrase.reputation_for(:difficulty_with_scope, :s3).should == 0
