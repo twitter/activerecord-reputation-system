@@ -1,3 +1,11 @@
+## ActiveRecordReputationSystem 3.0.0 ##
+
+* Add ability to set custom aggregation functions.
+
+* Make ActiveRecord 4 compatible.
+
+* Drop Rails 3 and Ruby 1.8 support.
+
 ## ActiveRecordReputationSystem 2.0.2 ##
 
 * Fix a bug associated with `add_or_update_evaluation` method that happens when source uses STI.
