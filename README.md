@@ -9,6 +9,8 @@ The Active Record Reputation System helps you build the reputation system for yo
 
 * If you are updating to version 2 from version older, you should check out [migration guide](https://github.com/twitter/activerecord-reputation-system/wiki/Migrate-to-Version-2.0).
 
+* **For Rails 3 use versions 2.0.2 and older.**
+
 Add to Gemfile:
 
 ```ruby
