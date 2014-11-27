@@ -15,7 +15,7 @@
 ##
 
 module ReputationSystem
-module FinderMethods
+  module FinderMethods
     def self.included(klass)
       klass.extend ClassMethods
     end

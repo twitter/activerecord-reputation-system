@@ -62,7 +62,6 @@ module ReputationSystem
           end
 
           include ReputationSystem::QueryBuilder
-          include ReputationSystem::QueryMethods
           include ReputationSystem::FinderMethods
           include ReputationSystem::ReputationMethods
           include ReputationSystem::ScopeMethods
