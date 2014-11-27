@@ -24,7 +24,7 @@ describe ReputationSystem::Reputation do
   context "Validation" do
     it "should have value 0 by default in case of non product process" do
       r = ReputationSystem::Reputation.create!(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum')
-      r.value.should == 0
+      expect(r.value).to eq(0)
     end
 
     it "should be able to change value to 0 if process is not product process" do
@@ -32,31 +32,31 @@ describe ReputationSystem::Reputation do
       r.value = 0
       r.save!
       r.reload
-      r.value.should == 0
+      expect(r.value).to eq(0)
     end
 
     it "should have value 1 by default in case of product process" do
       r = ReputationSystem::Reputation.create!(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'product')
-      r.value.should == 1
+      expect(r.value).to eq(1)
     end
 
     it "should be able to create reputation with process 'sum', 'average' and 'product'" do
-      ReputationSystem::Reputation.create(:reputation_name => "karma1", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').should be_valid
-      ReputationSystem::Reputation.create(:reputation_name => "karma2", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'average').should be_valid
-      ReputationSystem::Reputation.create(:reputation_name => "karma3", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'product').should be_valid
+      expect(ReputationSystem::Reputation.create(:reputation_name => "karma1", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum')).to be_valid
+      expect(ReputationSystem::Reputation.create(:reputation_name => "karma2", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'average')).to be_valid
+      expect(ReputationSystem::Reputation.create(:reputation_name => "karma3", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'product')).to be_valid
     end
 
     it "should be able to create reputation with custom process" do
-      ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'custom_process').should be_valid
+      expect(ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'custom_process')).to be_valid
     end
 
    it "should be able to create reputation with custom process from source" do
-      ReputationSystem::Reputation.create(:reputation_name => "custom_rating", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'custom_rating').should be_valid
+      expect(ReputationSystem::Reputation.create(:reputation_name => "custom_rating", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'custom_rating')).to be_valid
     end
 
     it "should not be able to create reputation of the same name for the same target" do
-      ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').should be_valid
-      ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum').should_not be_valid
+      expect(ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum')).to be_valid
+      expect(ReputationSystem::Reputation.create(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum')).not_to be_valid
     end
   end
 
@@ -66,14 +66,14 @@ describe ReputationSystem::Reputation do
         question = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         question.add_evaluation(:total_votes, 5, @user)
         rep = ReputationSystem::Reputation.find_by_reputation_name_and_target(:total_votes, question)
-        rep.target_type.should == question.class.name
+        expect(rep.target_type).to eq(question.class.name)
       end
       it "should assign target's ancestors class name where reputation is declared if STI" do
         designer = Designer.create! :name => 'hiro'
         programmer = Programmer.create! :name => 'katsuya'
         programmer.add_evaluation(:leadership, 1, designer)
         rep = ReputationSystem::Reputation.find_by_reputation_name_and_target(:leadership, programmer)
-        rep.target_type.should == Person.name
+        expect(rep.target_type).to eq(Person.name)
       end
     end
   end
@@ -86,16 +86,16 @@ describe ReputationSystem::Reputation do
 
     it "should delete associated received messages" do
       rep = ReputationSystem::Reputation.find_by_target_id_and_target_type(@question.id, 'Question')
-      ReputationSystem::ReputationMessage.find_by_receiver_id(rep.id).should_not be_nil
+      expect(ReputationSystem::ReputationMessage.find_by_receiver_id(rep.id)).not_to be_nil
       rep.destroy
-      ReputationSystem::ReputationMessage.find_by_receiver_id(rep.id).should be_nil
+      expect(ReputationSystem::ReputationMessage.find_by_receiver_id(rep.id)).to be_nil
     end
 
     it "should delete associated sent messages" do
       rep = ReputationSystem::Reputation.find_by_target_id_and_target_type(@user.id, 'User')
-      ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(rep.id, rep.class.name).should_not be_nil
+      expect(ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(rep.id, rep.class.name)).not_to be_nil
       rep.destroy
-      ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(rep.id, rep.class.name).should be_nil
+      expect(ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(rep.id, rep.class.name)).to be_nil
     end
   end
 
@@ -111,13 +111,13 @@ describe ReputationSystem::Reputation do
     end
 
     it "should return correct normalized value" do
-      @r1.normalized_value.should be_within(DELTA).of(0)
-      @r2.normalized_value.should be_within(DELTA).of(0.5)
-      @r3.normalized_value.should be_within(DELTA).of(1)
+      expect(@r1.normalized_value).to be_within(DELTA).of(0)
+      expect(@r2.normalized_value).to be_within(DELTA).of(0.5)
+      expect(@r3.normalized_value).to be_within(DELTA).of(1)
     end
 
     it "should return 0 if max and min are the same" do
-      @r4.normalized_value.should be_within(DELTA).of(0)
+      expect(@r4.normalized_value).to be_within(DELTA).of(0)
     end
   end
 
@@ -128,13 +128,13 @@ describe ReputationSystem::Reputation do
       answer = Answer.create!
       answer.add_evaluation(:avg_rating, 3, user1)
       answer.add_evaluation(:avg_rating, 2, user2)
-      answer.reputation_for(:avg_rating).should be_within(DELTA).of(2.5)
+      expect(answer.reputation_for(:avg_rating)).to be_within(DELTA).of(2.5)
       answer.delete_evaluation(:avg_rating, user1)
-      answer.reputation_for(:avg_rating).should be_within(DELTA).of(2)
+      expect(answer.reputation_for(:avg_rating)).to be_within(DELTA).of(2)
       answer.delete_evaluation(:avg_rating, user2)
-      answer.reputation_for(:avg_rating).should be_within(DELTA).of(0)
+      expect(answer.reputation_for(:avg_rating)).to be_within(DELTA).of(0)
       answer.add_evaluation(:avg_rating, 3, user1)
-      answer.reputation_for(:avg_rating).should be_within(DELTA).of(3)
+      expect(answer.reputation_for(:avg_rating)).to be_within(DELTA).of(3)
     end
   end
 
@@ -145,7 +145,7 @@ describe ReputationSystem::Reputation do
       answer = Answer.create!
       answer.add_or_update_evaluation(:custom_rating, 3, user1)
       answer.add_or_update_evaluation(:custom_rating, 2, user2)
-      answer.reputation_for(:custom_rating).should be_within(DELTA).of(50)
+      expect(answer.reputation_for(:custom_rating)).to be_within(DELTA).of(50)
     end
 
     it "should calculate based on a custom function for updated source" do
@@ -154,14 +154,14 @@ describe ReputationSystem::Reputation do
       answer = Answer.create!
       answer.add_or_update_evaluation(:custom_rating, 3, user1)
       answer.add_or_update_evaluation(:custom_rating, 2, user1)
-      answer.reputation_for(:custom_rating).should be_within(DELTA).of(20)
+      expect(answer.reputation_for(:custom_rating)).to be_within(DELTA).of(20)
     end
   end
 
   describe "additional data" do
     it "should have data as a serialized field" do
       r = ReputationSystem::Reputation.create!(:reputation_name => "karma", :target_id => @user.id, :target_type => @user.class.to_s, :aggregated_by => 'sum')
-      r.data.should be_a(Hash)
+      expect(r.data).to be_a(Hash)
     end
   end
 end

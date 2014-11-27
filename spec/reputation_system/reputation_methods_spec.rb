@@ -28,26 +28,26 @@ describe ReputationSystem::ReputationMethods do
   context "Primary Reputation" do
     describe "#reputation_for" do
       it "should return 0 as a default" do
-        @question.reputation_for(:total_votes).should == 0
+        expect(@question.reputation_for(:total_votes)).to eq(0)
       end
 
       it "should return appropriate value in case of valid input" do
         user2 = User.new(:name => 'dick')
         @question.add_evaluation(:total_votes, 1, @user)
         @question.add_evaluation(:total_votes, 1, user2)
-        @question.reputation_for(:total_votes).should == 2
+        expect(@question.reputation_for(:total_votes)).to eq(2)
       end
 
       it "should raise exception if invalid reputation name is given" do
-        lambda {@question.reputation_for(:invalid)}.should raise_error(ArgumentError)
+        expect {@question.reputation_for(:invalid)}.to raise_error(ArgumentError)
       end
 
       it "should raise exception if scope is given for reputation with no scopes" do
-        lambda {@question.reputation_for(:difficulty, :s1)}.should raise_error(ArgumentError)
+        expect {@question.reputation_for(:difficulty, :s1)}.to raise_error(ArgumentError)
       end
 
       it "should raise exception if scope is not given for reputation with scopes" do
-        lambda {@phrase.reputation_for(:difficulty_with_scope)}.should raise_error(ArgumentError)
+        expect {@phrase.reputation_for(:difficulty_with_scope)}.to raise_error(ArgumentError)
       end
     end
 
@@ -60,8 +60,8 @@ describe ReputationSystem::ReputationMethods do
         end
 
         it "should return rank properly" do
-          @question.rank_for(:total_votes).should == 2
-          @question2.rank_for(:total_votes).should == 1
+          expect(@question.rank_for(:total_votes)).to eq(2)
+          expect(@question2.rank_for(:total_votes)).to eq(1)
         end
       end
 
@@ -75,8 +75,8 @@ describe ReputationSystem::ReputationMethods do
         end
 
         it "should return rank properly" do
-          @phrase.rank_for(:maturity, :ja).should == 2
-          @phrase2.rank_for(:maturity, :ja).should == 1
+          expect(@phrase.rank_for(:maturity, :ja)).to eq(2)
+          expect(@phrase2.rank_for(:maturity, :ja)).to eq(1)
         end
       end
     end
@@ -86,11 +86,11 @@ describe ReputationSystem::ReputationMethods do
     describe "#reputation_for" do
       it "should always have correct updated value" do
         question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
-        @user.reputation_for(:question_karma).should == 0
+        expect(@user.reputation_for(:question_karma)).to eq(0)
         @question.add_evaluation(:total_votes, 1, @user)
-        @user.reputation_for(:question_karma).should == 1
+        expect(@user.reputation_for(:question_karma)).to eq(1)
         question2.add_evaluation(:total_votes, 1, @user)
-        @user.reputation_for(:question_karma).should == 2
+        expect(@user.reputation_for(:question_karma)).to eq(2)
       end
     end
   end
@@ -108,11 +108,11 @@ describe ReputationSystem::ReputationMethods do
         answer2 = Answer.create!(:text => 'Yes!', :author_id => @user.id, :question_id => question2.id)
         answer.add_evaluation(:avg_rating, 3, @user)
         answer2.add_evaluation(:avg_rating, 2, @user)
-        answer.reputation_for(:weighted_avg_rating).should == 3
-        answer2.reputation_for(:weighted_avg_rating).should == 4
-        @user.reputation_for(:answer_karma).should be_within(DELTA).of(3.5)
-        @user.reputation_for(:question_karma).should be_within(DELTA).of(2)
-        @user.reputation_for(:karma).should be_within(DELTA).of(1.4)
+        expect(answer.reputation_for(:weighted_avg_rating)).to eq(3)
+        expect(answer2.reputation_for(:weighted_avg_rating)).to eq(4)
+        expect(@user.reputation_for(:answer_karma)).to be_within(DELTA).of(3.5)
+        expect(@user.reputation_for(:question_karma)).to be_within(DELTA).of(2)
+        expect(@user.reputation_for(:karma)).to be_within(DELTA).of(1.4)
       end
     end
   end
@@ -120,7 +120,7 @@ describe ReputationSystem::ReputationMethods do
   context "Normalization" do
     describe "#normalized_reputation_for" do
       it "should return 0 as if there is no data" do
-        @question.normalized_reputation_for(:total_votes).should == 0
+        expect(@question.normalized_reputation_for(:total_votes)).to eq(0)
       end
 
       it "should return appropriate value in case of valid input" do
@@ -129,21 +129,21 @@ describe ReputationSystem::ReputationMethods do
         @question.add_evaluation(:total_votes, 1, @user)
         question2.add_evaluation(:total_votes, 2, @user)
         question3.add_evaluation(:total_votes, 3, @user)
-        @question.normalized_reputation_for(:total_votes).should == 0
-        question2.normalized_reputation_for(:total_votes).should == 0.5
-        question3.normalized_reputation_for(:total_votes).should == 1
+        expect(@question.normalized_reputation_for(:total_votes)).to eq(0)
+        expect(question2.normalized_reputation_for(:total_votes)).to eq(0.5)
+        expect(question3.normalized_reputation_for(:total_votes)).to eq(1)
       end
 
       it "should raise exception if invalid reputation name is given" do
-        lambda {@question.normalized_reputation_for(:invalid)}.should raise_error(ArgumentError)
+        expect {@question.normalized_reputation_for(:invalid)}.to raise_error(ArgumentError)
       end
 
       it "should raise exception if scope is given for reputation with no scopes" do
-        lambda {@question.normalized_reputation_for(:difficulty, :s1)}.should raise_error(ArgumentError)
+        expect {@question.normalized_reputation_for(:difficulty, :s1)}.to raise_error(ArgumentError)
       end
 
       it "should raise exception if scope is not given for reputation with scopes" do
-        lambda {@phrase.normalized_reputation_for(:difficulty_with_scope)}.should raise_error(ArgumentError)
+        expect {@phrase.normalized_reputation_for(:difficulty_with_scope)}.to raise_error(ArgumentError)
       end
     end
 
@@ -153,9 +153,9 @@ describe ReputationSystem::ReputationMethods do
         @question2.add_evaluation(:total_votes, 70, @user)
         @question.add_evaluation(:total_votes, 100, @user)
         @question.deactivate_all_reputations
-        ReputationSystem::Reputation.where(:reputation_name => 'total_votes', :active => true).maximum(:value).should == 70
+        expect(ReputationSystem::Reputation.where(:reputation_name => 'total_votes', :active => true).maximum(:value)).to eq(70)
         @question.activate_all_reputations
-        ReputationSystem::Reputation.where(:reputation_name => 'total_votes', :active => true).maximum(:value).should == 100
+        expect(ReputationSystem::Reputation.where(:reputation_name => 'total_votes', :active => true).maximum(:value)).to eq(100)
       end
     end
   end

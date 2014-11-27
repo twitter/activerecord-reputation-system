@@ -28,7 +28,7 @@ describe ReputationSystem::Evaluation do
     end
     it "should not be able to create an evaluation from given source if it has already evaluated the same reputation of the target" do
       ReputationSystem::Evaluation.create!(@attributes)
-      lambda {ReputationSystem::Evaluation.create!(@attributes)}.should raise_error
+      expect {ReputationSystem::Evaluation.create!(@attributes)}.to raise_error
     end
   end
 
@@ -38,14 +38,14 @@ describe ReputationSystem::Evaluation do
         question = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         question.add_evaluation(:total_votes, 5, @user)
         evaluation = ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(:total_votes, @user, question)
-        evaluation.source_type.should == @user.class.name
+        expect(evaluation.source_type).to eq(@user.class.name)
       end
       it "should assign source's ancestors class name where reputation is declared if STI" do
         designer = Designer.create! :name => 'hiro'
         programmer = Programmer.create! :name => 'katsuya'
         programmer.add_evaluation(:leadership, 1, designer)
         evaluation = ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(:leadership, designer, programmer)
-        evaluation.source_type.should == Person.name
+        expect(evaluation.source_type).to eq(Person.name)
       end
     end
   end
@@ -54,9 +54,9 @@ describe ReputationSystem::Evaluation do
     it "should delete associated reputation message" do
       @question.add_evaluation(:total_votes, 5, @user)
       evaluation = ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(:total_votes, @user, @question)
-      ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name).should_not be_nil
+      expect(ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name)).not_to be_nil
       @question.delete_evaluation(:total_votes, @user)
-      ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name).should be_nil
+      expect(ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name)).to be_nil
     end
   end
 
@@ -64,7 +64,7 @@ describe ReputationSystem::Evaluation do
     it "should have data as a serialized field" do
       @attributes = {:reputation_name => 'total_votes', :source => @user, :target => @question, :value => 1}
       e = ReputationSystem::Evaluation.create!(@attributes)
-      e.data.should be_a(Hash)
+      expect(e.data).to be_a(Hash)
     end
   end
 end

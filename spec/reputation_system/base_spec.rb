@@ -28,22 +28,22 @@ describe ReputationSystem::Base do
   context "Mixin" do
     describe "#has_reputation" do
       it "should add 'add_evaluation' method to a model with primary reputation" do
-        @question.respond_to?(:add_evaluation).should == true
-        @answer.respond_to?(:add_evaluation).should == true
+        expect(@question.respond_to?(:add_evaluation)).to eq(true)
+        expect(@answer.respond_to?(:add_evaluation)).to eq(true)
       end
 
       it "should not add 'add_evaluation' method to a model without primary reputation" do
-        @user.respond_to?(:add_evaluation).should == false
+        expect(@user.respond_to?(:add_evaluation)).to eq(false)
       end
 
       it "should add 'reputation_for' method to a model with reputation" do
-        @user.respond_to?(:reputation_for).should == true
-        @question.respond_to?(:reputation_for).should == true
+        expect(@user.respond_to?(:reputation_for)).to eq(true)
+        expect(@question.respond_to?(:reputation_for)).to eq(true)
       end
 
       it "should add 'normalized_reputation_for' method to a model with reputation" do
-        @user.respond_to?(:normalized_reputation_for).should == true
-        @question.respond_to?(:normalized_reputation_for).should == true
+        expect(@user.respond_to?(:normalized_reputation_for)).to eq(true)
+        expect(@question.respond_to?(:normalized_reputation_for)).to eq(true)
       end
 
       it "should delete reputations if target is deleted" do
@@ -51,8 +51,8 @@ describe ReputationSystem::Base do
         reputation_count = ReputationSystem::Reputation.count
         message_count = ReputationSystem::ReputationMessage.count
         @question.destroy
-        ReputationSystem::Reputation.count.should < reputation_count
-        ReputationSystem::ReputationMessage.count.should < message_count
+        expect(ReputationSystem::Reputation.count).to be < reputation_count
+        expect(ReputationSystem::ReputationMessage.count).to be < message_count
       end
     end
   end
@@ -60,42 +60,42 @@ describe ReputationSystem::Base do
   context "Association" do
     describe "#reputations" do
       it "should define reputations association" do
-        @question.respond_to?(:reputations).should == true
+        expect(@question.respond_to?(:reputations)).to eq(true)
       end
       it "should return all reputations for the target" do
         @question.add_evaluation(:total_votes, 2, @user)
         @question.add_evaluation(:difficulty, 2, @user)
-        @question.reputations.count.should == 2
+        expect(@question.reputations.count).to eq(2)
       end
       describe "#for" do
         it "should return empty array if there is no reputation for the target" do
-          @question.reputations.for(:total_votes).should == []
+          expect(@question.reputations.for(:total_votes)).to eq([])
         end
         it "should return all reputations of the given type for the target" do
           @question.add_evaluation(:total_votes, 2, @user)
           @question.add_evaluation(:difficulty, 2, @user)
-          @question.reputations.for(:total_votes).count.should == 1
+          expect(@question.reputations.for(:total_votes).count).to eq(1)
         end
       end
     end
 
     describe "#evaluations" do
       it "should define evaluations association" do
-        @question.respond_to?(:evaluations).should == true
+        expect(@question.respond_to?(:evaluations)).to eq(true)
       end
       it "should return all evaluations for the target" do
         @question.add_evaluation(:total_votes, 2, @user)
         @question.add_evaluation(:difficulty, 2, @user)
-        @question.evaluations.count.should == 2
+        expect(@question.evaluations.count).to eq(2)
       end
       describe "#for" do
         it "should return empty array if there is no evaluation for the target" do
-          @question.evaluations.for(:total_votes).should == []
+          expect(@question.evaluations.for(:total_votes)).to eq([])
         end
         it "should return all evaluations of the given type for the target" do
           @question.add_evaluation(:total_votes, 2, @user)
           @question.add_evaluation(:difficulty, 2, @user)
-          @question.evaluations.for(:total_votes).count.should == 1
+          expect(@question.evaluations.for(:total_votes).count).to eq(1)
         end
       end
     end

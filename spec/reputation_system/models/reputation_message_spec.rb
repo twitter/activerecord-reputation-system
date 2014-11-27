@@ -25,12 +25,12 @@ describe ReputationSystem::ReputationMessage do
 
   context "Validation" do
     it "should not be able to create a message from given sender if it has already sent one to the same receiver" do
-      ReputationSystem::ReputationMessage.create(:sender => @rep1, :receiver => @rep2).should be_valid
-      ReputationSystem::ReputationMessage.create(:sender => @rep1, :receiver => @rep2).should_not be_valid
+      expect(ReputationSystem::ReputationMessage.create(:sender => @rep1, :receiver => @rep2)).to be_valid
+      expect(ReputationSystem::ReputationMessage.create(:sender => @rep1, :receiver => @rep2)).not_to be_valid
     end
 
     it "should have raise error if sender is neither ReputationSystem::Evaluation and ReputationSystem::Reputation" do
-      ReputationSystem::ReputationMessage.create(:sender => @user, :receiver => @rep2).errors[:sender].should_not be_nil
+      expect(ReputationSystem::ReputationMessage.create(:sender => @user, :receiver => @rep2).errors[:sender]).not_to be_nil
     end
   end
 
@@ -41,7 +41,7 @@ describe ReputationSystem::ReputationMessage do
       evaluation = ReputationSystem::Evaluation.find_by_reputation_name_and_source_and_target(:total_votes, @user, question)
       m = ReputationSystem::ReputationMessage.find_by_sender_id_and_sender_type(evaluation.id, evaluation.class.name)
       m.destroy
-      lambda { evaluation.reload }.should raise_error ActiveRecord::RecordNotFound
+      expect { evaluation.reload }.to raise_error ActiveRecord::RecordNotFound
     end
   end
 end

@@ -29,15 +29,15 @@ describe ReputationSystem::ScopeMethods do
     it "should add scope if the reputation has scopes defined" do
       Phrase.add_scope_for(:difficulty_with_scope, :s4)
       @phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s4)
-      @phrase.reputation_for(:difficulty_with_scope, :s4).should == 2
+      expect(@phrase.reputation_for(:difficulty_with_scope, :s4)).to eq(2)
     end
 
     it "should raise exception if the scope already exist" do
-      lambda{Phrase.add_scope_for(:difficulty_with_scope, :s1)}.should raise_error(ArgumentError)
+      expect{Phrase.add_scope_for(:difficulty_with_scope, :s1)}.to raise_error(ArgumentError)
     end
 
     it "should raise exception if the reputation does not have scopes defined" do
-      lambda{Question.add_scope_for(:difficulty, :s1)}.should raise_error(ArgumentError)
+      expect{Question.add_scope_for(:difficulty, :s1)}.to raise_error(ArgumentError)
     end
   end
 end

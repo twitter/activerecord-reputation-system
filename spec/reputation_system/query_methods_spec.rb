@@ -33,30 +33,30 @@ describe ReputationSystem::QueryMethods do
 
       it "should return result with given reputation" do
         res = Question.with_reputation(:total_votes)
-        res.should == [@question]
-        res[0].total_votes.should_not be_nil
+        expect(res).to eq([@question])
+        expect(res[0].total_votes).not_to be_nil
       end
 
       it "should retain conditions option" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 5, @user)
         res = Question.with_reputation(:total_votes).where("total_votes > 4")
-        res.should == [@question2]
+        expect(res).to eq([@question2])
       end
 
       it "should retain joins option" do
         res = Question.with_reputation(:total_votes).
           select("questions.*, users.name AS user_name").
           joins("JOIN users ON questions.author_id = users.id")
-        res.should == [@question]
-        res[0].user_name.should == @user.name
+        expect(res).to eq([@question])
+        expect(res[0].user_name).to eq(@user.name)
       end
 
       it "should not retain select option" do
         res = Question.with_reputation(:total_votes).select("questions.id")
-        res.should == [@question]
-        res[0].id.should_not be_nil
-        lambda {res[0].text}.should_not raise_error
+        expect(res).to eq([@question])
+        expect(res[0].id).not_to be_nil
+        expect {res[0].text}.not_to raise_error
       end
     end
 
@@ -70,8 +70,8 @@ describe ReputationSystem::QueryMethods do
 
       it "should return result with given reputation" do
         res = Phrase.with_reputation(:maturity, :ja)
-        res.should == [@phrase]
-        res[0].maturity.should == 3
+        expect(res).to eq([@phrase])
+        expect(res[0].maturity).to eq(3)
       end
     end
   end
@@ -84,30 +84,30 @@ describe ReputationSystem::QueryMethods do
 
       it "should return result with given reputation" do
         res = Question.with_reputation_only(:total_votes)
-        res.length.should == 1
-        res[0].total_votes.should_not be_nil
+        expect(res.length).to eq(1)
+        expect(res[0].total_votes).not_to be_nil
       end
 
       it "should retain conditions option" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 5, @user)
         res = Question.with_reputation_only(:total_votes).where("total_votes > 4")
-        res.length.should == 1
-        res[0].total_votes.should > 4
+        expect(res.length).to eq(1)
+        expect(res[0].total_votes).to be > 4
       end
 
       it "should retain joins option" do
         res = Question.with_reputation_only(:total_votes).
           select("questions.*, users.name AS user_name").
           joins("JOIN users ON questions.author_id = users.id")
-        res[0].user_name.should == @user.name
+        expect(res[0].user_name).to eq(@user.name)
       end
 
       it "should retain select option" do
         res = Question.with_reputation_only(:total_votes).select("questions.id")
-        res.should == [@question]
-        res[0].id.should_not be_nil
-        lambda {res[0].text}.should raise_error
+        expect(res).to eq([@question])
+        expect(res[0].id).not_to be_nil
+        expect {res[0].text}.to raise_error
       end
     end
 
@@ -121,8 +121,8 @@ describe ReputationSystem::QueryMethods do
 
       it "should return result with given reputation" do
         res = Phrase.with_reputation_only(:maturity, :ja)
-        res.length.should == 1
-        res[0].maturity.should == 3
+        expect(res.length).to eq(1)
+        expect(res[0].maturity).to eq(3)
       end
     end
   end
@@ -137,31 +137,31 @@ describe ReputationSystem::QueryMethods do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 6, @user)
         res = Question.with_normalized_reputation(:total_votes)
-        res.should == [@question, @question2]
-        res[0].normalized_total_votes.should be_within(DELTA).of(0)
-        res[1].normalized_total_votes.should be_within(DELTA).of(1)
+        expect(res).to eq([@question, @question2])
+        expect(res[0].normalized_total_votes).to be_within(DELTA).of(0)
+        expect(res[1].normalized_total_votes).to be_within(DELTA).of(1)
       end
 
       it "should not retain select option" do
         res = Question.with_normalized_reputation(:total_votes).select("questions.id")
-        res.should == [@question]
-        res[0].id.should_not be_nil
-        lambda {res[0].text}.should_not raise_error
+        expect(res).to eq([@question])
+        expect(res[0].id).not_to be_nil
+        expect {res[0].text}.not_to raise_error
       end
 
       it "should retain conditions option" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 6, @user)
         res = Question.with_normalized_reputation(:total_votes).where("normalized_total_votes > 0.6")
-        res.should == [@question2]
+        expect(res).to eq([@question2])
       end
 
       it "should retain joins option" do
         res = Question.with_normalized_reputation(:total_votes).
           select("questions.*, users.name AS user_name").
           joins("JOIN users ON questions.author_id = users.id")
-        res.should == [@question]
-        res[0].user_name.should == @user.name
+        expect(res).to eq([@question])
+        expect(res[0].user_name).to eq(@user.name)
       end
     end
 
@@ -175,8 +175,8 @@ describe ReputationSystem::QueryMethods do
 
       it "should return result with given reputation" do
         res = Phrase.with_normalized_reputation(:maturity, :ja)
-        res.should == [@phrase]
-        res[0].normalized_maturity.should be_within(DELTA).of(0)
+        expect(res).to eq([@phrase])
+        expect(res[0].normalized_maturity).to be_within(DELTA).of(0)
       end
     end
   end
@@ -191,32 +191,32 @@ describe ReputationSystem::QueryMethods do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 6, @user)
         res = Question.with_normalized_reputation_only(:total_votes)
-        res.length.should == 2
-        res[0].normalized_total_votes.should be_within(DELTA).of(0)
-        res[1].normalized_total_votes.should be_within(DELTA).of(1)
+        expect(res.length).to eq(2)
+        expect(res[0].normalized_total_votes).to be_within(DELTA).of(0)
+        expect(res[1].normalized_total_votes).to be_within(DELTA).of(1)
       end
 
       it "should not retain select option" do
         res = Question.with_normalized_reputation_only(:total_votes).select("questions.id")
-        res.length.should == 1
-        res[0].id.should_not be_nil
-        lambda {res[0].text}.should raise_error
+        expect(res.length).to eq(1)
+        expect(res[0].id).not_to be_nil
+        expect {res[0].text}.to raise_error
       end
 
       it "should retain conditions option" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 6, @user)
         res = Question.with_normalized_reputation_only(:total_votes).where("normalized_total_votes > 0.6")
-        res.length.should == 1
-        res[0].normalized_total_votes.should > 0.6
+        expect(res.length).to eq(1)
+        expect(res[0].normalized_total_votes).to be > 0.6
       end
 
       it "should retain joins option" do
         res = Question.with_normalized_reputation_only(:total_votes).
           select("questions.*, users.name AS user_name").
           joins("JOIN users ON questions.author_id = users.id")
-        res.length.should == 1
-        res[0].user_name.should == @user.name
+        expect(res.length).to eq(1)
+        expect(res[0].user_name).to eq(@user.name)
       end
     end
 
@@ -230,8 +230,8 @@ describe ReputationSystem::QueryMethods do
 
       it "should return result with given reputation" do
         res = Phrase.with_normalized_reputation_only(:maturity, :ja)
-        res.length.should == 1
-        res[0].normalized_maturity.should be_within(DELTA).of(0)
+        expect(res.length).to eq(1)
+        expect(res[0].normalized_maturity).to be_within(DELTA).of(0)
       end
     end
   end
