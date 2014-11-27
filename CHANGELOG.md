@@ -1,3 +1,7 @@
+## ActiveRecordReputationSystem 3.0.1 ##
+
+* Remove `protected_attributes` to fix a Rails 4 compatibility.
+
 ## ActiveRecordReputationSystem 3.0.0 ##
 
 * Add ability to set custom aggregation functions.
