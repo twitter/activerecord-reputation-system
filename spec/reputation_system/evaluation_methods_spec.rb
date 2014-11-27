@@ -86,6 +86,44 @@ describe ReputationSystem::EvaluationMethods do
       end
     end
 
+    describe "#evaluation_by" do
+      it "should return nil if it is not evaluated by a given source" do
+        expect(@question.evaluation_by(:total_votes, @user)).to be nil
+      end
+
+      it "should return a value for an evaluation by a given source" do
+        user2 = User.create!(:name => 'katsuya')
+        question2 = Question.create!(:text => 'Question 2', :author_id => @user.id)
+        expect(@question.add_evaluation(:total_votes, 1, @user)).to be true
+        expect(question2.add_evaluation(:total_votes, 2, user2)).to be true
+        expect(@question.evaluation_by(:total_votes, @user)).to eq(1)
+        expect(question2.evaluation_by(:total_votes, user2)).to eq(2)
+      end
+
+      context "With Scopes" do
+        it "should return a value for an evaluation by a given source on appropriate scope" do
+          user2 = User.create!(:name => 'katsuya')
+          phrase2 = Phrase.create!(:text => "Two")
+          expect(@phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1)).to be true
+          expect(@phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2)).to be true
+          expect(@phrase.add_evaluation(:difficulty_with_scope, 3, user2, :s2)).to be true
+          expect(@phrase.add_evaluation(:difficulty_with_scope, 4, user2, :s3)).to be true
+          expect(phrase2.add_evaluation(:difficulty_with_scope, 1, user2, :s1)).to be true
+          expect(phrase2.add_evaluation(:difficulty_with_scope, 2, user2, :s2)).to be true
+          expect(phrase2.add_evaluation(:difficulty_with_scope, 3, @user, :s2)).to be true
+          expect(phrase2.add_evaluation(:difficulty_with_scope, 4, @user, :s3)).to be true
+          expect(@phrase.evaluation_by(:difficulty_with_scope, @user, :s1)).to eq(1)
+          expect(@phrase.evaluation_by(:difficulty_with_scope, @user, :s2)).to eq(2)
+          expect(@phrase.evaluation_by(:difficulty_with_scope, user2, :s2)).to eq(3)
+          expect(@phrase.evaluation_by(:difficulty_with_scope, user2, :s3)).to eq(4)
+          expect(phrase2.evaluation_by(:difficulty_with_scope, user2, :s1)).to eq(1)
+          expect(phrase2.evaluation_by(:difficulty_with_scope, user2, :s2)).to eq(2)
+          expect(phrase2.evaluation_by(:difficulty_with_scope, @user, :s2)).to eq(3)
+          expect(phrase2.evaluation_by(:difficulty_with_scope, @user, :s3)).to eq(4)
+        end
+      end
+    end
+
     describe "#evaluators_for" do
       it "should return an empty array if it is not evaluated for a given reputation" do
         expect(@question.evaluators_for(:total_votes)).to eq([])
