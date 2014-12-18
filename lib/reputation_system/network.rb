@@ -150,7 +150,11 @@ module ReputationSystem
           # Passing "this" is not pretty but in some case "instance_exec" method
           # does not give right context for some reason.
           # This could be ruby bug. Needs further investigation.
-          rep[:of] = lambda { |this| instance_exec(this, scope.to_s, &source_def[:of]) } if source_def[:of].is_a? Proc
+          if source_def[:of].is_a? Proc
+            rep[:of] = lambda { |this| instance_exec(this, scope.to_s, &source_def[:of]) }
+          else
+            rep[:of] = source_def[:of]
+          end
           rep
         end
 
