@@ -140,7 +140,7 @@ Katsuya Noguchi
 1. [NARKOZ (Nihad Abbasov)](https://github.com/NARKOZ) - 4 commits
 2. [elitheeli (Eli Fox-Epstein)](https://github.com/elitheeli) - 1 commit
 3. [amrnt (Amr Tamimi)](https://github.com/amrnt) - 1 commit
-4. [caiosba (Caio Almeida)](https://github.com/caiosba) - 1 commit
+4. [caiosba (Caio Almeida)](https://github.com/caiosba) - 2 commits
 
 ## Related Links
 
