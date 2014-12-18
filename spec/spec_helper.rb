@@ -209,6 +209,11 @@ class Phrase < ActiveRecord::Base
     :scopes => [:ja, :fr, :de],
     :source_of => { :reputation => :maturity_all, :of => :self, :defined_for_scope => [:ja, :fr] }
 
+  has_reputation :maturity_of_all_translations,
+    :source => { :reputation => :votes, :of => :translations },
+    :aggregated_by => :sum,
+    :scopes => [:ja, :fr, :de]
+
   has_reputation :difficulty_with_scope,
     :source => :user,
     :aggregated_by => :average,
@@ -222,7 +227,10 @@ class Translation < ActiveRecord::Base
   has_reputation :votes,
     :source => :user,
     :aggregated_by => :sum,
-    :source_of => { :reputation => :maturity, :of => :phrase, :scope => :locale}
+    :source_of => [
+      { :reputation => :maturity, :of => :phrase, :scope => :locale},
+      { :reputation => :maturity_of_all_translations, :of => :phrase, :scope => :locale}
+    ]
 end
 
 # For STI Specs
