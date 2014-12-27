@@ -4,7 +4,9 @@
 
 # 3.0.0 (October 7, 2014)
 
-  * Add ability to set custom aggregation functions.
+  * Add ability to set custom aggregation functions. (Caio Almeida)
+
+  * Add serialized data field to evaluation and reputation models. (Caio Almeida)
 
   * Make ActiveRecord 4 compatible.
 
@@ -89,7 +91,7 @@
 
 # 1.2.1 (July 14, 2012)
 
-  * Fix index names to be able to `db:rollback` the migrations.
+  * Fix index names to be able to `db:rollback` the migrations. (Amr Tamimi)
 
 # 1.2.0 (June 12, 2012)
 
@@ -101,7 +103,7 @@
 
   * Fix `add_or_update_evaluation` bug when using scope.
 
-  * Fix README bugs.
+  * Fix README bugs. (Eli Fox-Epstein)
 
 # 1.0.0 (May 17, 2012)
 
