@@ -79,6 +79,15 @@ module ReputationSystem
       end
     end
 
+    def add_or_delete_reputation(reputation_name, value, source, *args)
+      srn, evaluation = find_srn_and_evaluation(reputation_name, source, args.first)
+      if ReputationSystem::Evaluation.exists? :reputation_name => srn, :source_id => source.id, :source_type => source.class.name, :target_id => self.id, :target_type => self.class.name
+        !!delete_evaluation_without_validation(srn, evaluation)
+      else
+        self.add_evaluation(reputation_name, value, source, *args)
+      end
+    end
+
     def delete_evaluation(reputation_name, source, *args)
       srn, evaluation = find_srn_and_evaluation(reputation_name, source, args.first)
       if evaluation
