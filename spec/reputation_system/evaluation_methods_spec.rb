@@ -240,22 +240,22 @@ describe ReputationSystem::EvaluationMethods do
       end
     end
 
-    describe "#add_or_delete_reputation" do
+    describe "#add_or_delete_evaluation" do
       it "should create evaluation if it does not exist" do
-        expect(@question.add_or_delete_reputation(:total_votes, 1, @user)).to be true
+        expect(@question.add_or_delete_evaluation(:total_votes, 1, @user)).to be true
         expect(@question.reputation_for(:total_votes)).to eq(1)
       end
 
       it "should delete evaluation if it exists already" do
         @question.add_evaluation(:total_votes, 1, @user)
-        expect(@question.add_or_delete_reputation(:total_votes, 2, @user)).to be true
+        expect(@question.add_or_delete_evaluation(:total_votes, 2, @user)).to be true
         expect(@question.reputation_for(:total_votes)).to eq(0)
       end
 
       context "with scopes" do
         it "should add evaluation on appropriate scope if it does not exist" do
-          expect(@phrase.add_or_delete_reputation(:difficulty_with_scope, 1, @user, :s1)).to be true
-          expect(@phrase.add_or_delete_reputation(:difficulty_with_scope, 2, @user, :s2)).to be true
+          expect(@phrase.add_or_delete_evaluation(:difficulty_with_scope, 1, @user, :s1)).to be true
+          expect(@phrase.add_or_delete_evaluation(:difficulty_with_scope, 2, @user, :s2)).to be true
           expect(@phrase.reputation_for(:difficulty_with_scope, :s1)).to eq(1)
           expect(@phrase.reputation_for(:difficulty_with_scope, :s2)).to eq(2)
           expect(@phrase.reputation_for(:difficulty_with_scope, :s3)).to eq(0)
@@ -264,8 +264,8 @@ describe ReputationSystem::EvaluationMethods do
         it "should delete evaluation on appropriate scope if it exists already" do
           expect(@phrase.add_evaluation(:difficulty_with_scope, 1, @user, :s1)).to be true
           expect(@phrase.add_evaluation(:difficulty_with_scope, 2, @user, :s2)).to be true
-          expect(@phrase.add_or_delete_reputation(:difficulty_with_scope, 3, @user, :s1)).to be true
-          expect(@phrase.add_or_delete_reputation(:difficulty_with_scope, 5, @user, :s2)).to be true
+          expect(@phrase.add_or_delete_evaluation(:difficulty_with_scope, 3, @user, :s1)).to be true
+          expect(@phrase.add_or_delete_evaluation(:difficulty_with_scope, 5, @user, :s2)).to be true
           expect(@phrase.reputation_for(:difficulty_with_scope, :s1)).to eq(0)
           expect(@phrase.reputation_for(:difficulty_with_scope, :s2)).to eq(0)
           expect(@phrase.reputation_for(:difficulty_with_scope, :s3)).to eq(0)
@@ -276,9 +276,9 @@ describe ReputationSystem::EvaluationMethods do
         it "should be able to update evaluation by an object of a class with sti" do
           @post = Post.create! :name => "Post1"
           @designer = Designer.create! :name => "John"
-          @post.add_or_delete_reputation(:votes, 1, @designer)
+          @post.add_or_delete_evaluation(:votes, 1, @designer)
           expect(@post.reputation_for(:votes)).to eq(1)
-          @post.add_or_delete_reputation(:votes, -1, @designer)
+          @post.add_or_delete_evaluation(:votes, -1, @designer)
           expect(@post.reputation_for(:votes)).to eq(0)
         end
       end
