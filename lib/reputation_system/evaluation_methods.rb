@@ -47,7 +47,8 @@ module ReputationSystem
     def evaluators_for(reputation_name, *args)
       scope = args.first
       srn = ReputationSystem::Network.get_scoped_reputation_name(self.class.name, reputation_name, scope)
-      self.evaluations.for(srn).includes(:source).map(&:source)
+      ReputationSystem::Evaluation.where(target_id: self.id, target_type: self.class.name, reputation_name: srn)
+        .collect(&:source_id).collect{ |id| User.find(id) }
     end
 
     def add_evaluation(reputation_name, value, source, *args)
