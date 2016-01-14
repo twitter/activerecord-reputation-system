@@ -35,7 +35,7 @@ module FinderMethods
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         options[:conditions][0].gsub!(reputation_name.to_s, "COALESCE(rs_reputations.value, 0)")
-        joins(options[:joins]).select(options[:select]).where(options[:conditions]).count
+        joins(options[:joins]).where(options[:conditions]).count
       end
 
       def find_with_normalized_reputation(*args)
