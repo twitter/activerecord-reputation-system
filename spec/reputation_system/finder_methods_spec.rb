@@ -32,13 +32,13 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        res = Question.find_with_reputation(:total_votes, :all, {})
+        res = Question.find_with_reputation(:total_votes, {})
         expect(res).to eq([@question])
         expect(res[0].total_votes).not_to be_nil
       end
 
       it "should retain select option" do
-        res = Question.find_with_reputation(:total_votes, :all, {:select => "questions.id"})
+        res = Question.find_with_reputation(:total_votes, {:select => "questions.id"})
         expect(res).to eq([@question])
         expect(res[0].id).not_to be_nil
         expect(res[0].attributes).not_to include(:text)
@@ -47,12 +47,12 @@ describe ReputationSystem::FinderMethods do
       it "should retain conditions option" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 5, @user)
-        res = Question.find_with_reputation(:total_votes, :all, {:conditions => "total_votes > 4"})
+        res = Question.find_with_reputation(:total_votes, {:conditions => "total_votes > 4"})
         expect(res).to eq([@question2])
       end
 
       it "should retain joins option" do
-        res = Question.find_with_reputation(:total_votes, :all, {
+        res = Question.find_with_reputation(:total_votes, {
           :select => "questions.*, users.name AS user_name",
           :joins => "JOIN users ON questions.author_id = users.id"})
         expect(res).to eq([@question])
@@ -69,7 +69,7 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        res = Phrase.find_with_reputation(:maturity, :ja, :all, {})
+        res = Phrase.find_with_reputation(:maturity, :ja, {})
         expect(res).to eq([@phrase])
         expect(res[0].maturity).to eq(3)
       end
@@ -83,10 +83,10 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        expect(Question.count_with_reputation(:total_votes, :all, {
+        expect(Question.count_with_reputation(:total_votes, {
           :conditions => "total_votes < 2"
         })).to eq(0)
-        expect(Question.count_with_reputation(:total_votes, :all, {
+        expect(Question.count_with_reputation(:total_votes, {
           :conditions => "total_votes > 2"
         })).to eq(1)
       end
@@ -101,10 +101,10 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        expect(Phrase.count_with_reputation(:maturity, :ja, :all, {
+        expect(Phrase.count_with_reputation(:maturity, :ja, {
           :conditions => "maturity < 2"
         })).to eq(0)
-        expect(Phrase.count_with_reputation(:maturity, :ja, :all, {
+        expect(Phrase.count_with_reputation(:maturity, :ja, {
           :conditions => "maturity > 2"
         })).to eq(1)
       end
@@ -120,14 +120,14 @@ describe ReputationSystem::FinderMethods do
       it "should return result with given normalized reputation" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 6, @user)
-        res = Question.find_with_normalized_reputation(:total_votes, :all, {})
+        res = Question.find_with_normalized_reputation(:total_votes, {})
         expect(res).to eq([@question, @question2])
         expect(res[0].normalized_total_votes).to be_within(DELTA).of(0)
         expect(res[1].normalized_total_votes).to be_within(DELTA).of(1)
       end
 
       it "should retain select option" do
-        res = Question.find_with_normalized_reputation(:total_votes, :all, {:select => "questions.id"})
+        res = Question.find_with_normalized_reputation(:total_votes, {:select => "questions.id"})
         expect(res).to eq([@question])
         expect(res[0].id).not_to be_nil
         expect(res[0].attributes).not_to include(:text)
@@ -136,12 +136,12 @@ describe ReputationSystem::FinderMethods do
       it "should retain conditions option" do
         @question2 = Question.create!(:text => 'Does this work?', :author_id => @user.id)
         @question2.add_evaluation(:total_votes, 6, @user)
-        res = Question.find_with_normalized_reputation(:total_votes, :all, {:conditions => "normalized_total_votes > 0.6"})
+        res = Question.find_with_normalized_reputation(:total_votes, {:conditions => "normalized_total_votes > 0.6"})
         expect(res).to eq([@question2])
       end
 
       it "should retain joins option" do
-        res = Question.find_with_normalized_reputation(:total_votes, :all, {
+        res = Question.find_with_normalized_reputation(:total_votes, {
           :select => "questions.*, users.name AS user_name",
           :joins => "JOIN users ON questions.author_id = users.id"})
         expect(res).to eq([@question])
@@ -158,7 +158,7 @@ describe ReputationSystem::FinderMethods do
       end
 
       it "should return result with given reputation" do
-        res = Phrase.find_with_normalized_reputation(:maturity, :ja, :all, {})
+        res = Phrase.find_with_normalized_reputation(:maturity, :ja, {})
         expect(res).to eq([@phrase])
         expect(res[0].normalized_maturity).to be_within(DELTA).of(0)
       end
@@ -167,7 +167,7 @@ describe ReputationSystem::FinderMethods do
 
   describe "#find_with_reputation_sql" do
     it "should return a corresponding sql statement" do
-      sql = Question.find_with_reputation_sql(:total_votes, :all, {
+      sql = Question.find_with_reputation_sql(:total_votes, {
         :select => "questions.*, users.name AS user_name",
         :joins => "JOIN users ON questions.author_id = users.id",
         :conditions => "COALESCE(rs_reputations.value, 0) > 0.6",
