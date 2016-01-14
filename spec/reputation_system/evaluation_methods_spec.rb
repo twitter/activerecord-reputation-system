@@ -165,12 +165,12 @@ describe ReputationSystem::EvaluationMethods do
 
       it "should raise exception if the same source evaluates for the same target more than once" do
         @question.add_evaluation(:total_votes, 1, @user)
-        expect { @question.add_evaluation(:total_votes, 1, @user) }.to raise_error
+        expect { @question.add_evaluation(:total_votes, 1, @user) }.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it "should not allow the same source to add an evaluation for the same target" do
         @question.add_evaluation(:total_votes, 1, @user)
-        expect { @question.add_evaluation(:total_votes, 1, @user) }.to raise_error
+        expect { @question.add_evaluation(:total_votes, 1, @user) }.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it "should not raise exception if some association has not been initialized along during the propagation of reputation" do
@@ -303,7 +303,7 @@ describe ReputationSystem::EvaluationMethods do
       end
 
       it "should raise exception if evaluation does not exist" do
-        expect { @answer.update_evaluation(:avg_rating, 1, @user) }.to raise_error
+        expect { @answer.update_evaluation(:avg_rating, 1, @user) }.to raise_error(ArgumentError)
       end
 
       context "With Scopes" do
@@ -347,7 +347,7 @@ describe ReputationSystem::EvaluationMethods do
       end
 
       it "should raise exception if evaluation does not exist" do
-        expect { @answer.delete_evaluation!(:avg_rating, @user) }.to raise_error
+        expect { @answer.delete_evaluation!(:avg_rating, @user) }.to raise_error(ArgumentError)
       end
 
       context "With Scopes" do

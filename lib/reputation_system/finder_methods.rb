@@ -23,31 +23,31 @@ module FinderMethods
     module ClassMethods
 
       def find_with_reputation(*args)
-        reputation_name, srn, find_scope, options = parse_query_args(*args)
+        reputation_name, srn, options = parse_query_args(*args)
         options[:select] = build_select_statement(table_name, reputation_name, options[:select])
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
-        joins(options[:joins]).select(options[:select]).where(options[:conditions]).send(find_scope)
+        joins(options[:joins]).select(options[:select]).where(options[:conditions])
       end
 
       def count_with_reputation(*args)
-        reputation_name, srn, find_scope, options = parse_query_args(*args)
+        reputation_name, srn, options = parse_query_args(*args)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
         options[:conditions][0].gsub!(reputation_name.to_s, "COALESCE(rs_reputations.value, 0)")
-        joins(options[:joins]).select(options[:select]).where(options[:conditions]).send(find_scope).count
+        joins(options[:joins]).where(options[:conditions]).count
       end
 
       def find_with_normalized_reputation(*args)
-        reputation_name, srn, find_scope, options = parse_query_args(*args)
+        reputation_name, srn, options = parse_query_args(*args)
         options[:select] = build_select_statement(table_name, reputation_name, options[:select], srn, true)
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions], srn, true)
-        joins(options[:joins]).select(options[:select]).where(options[:conditions]).send(find_scope)
+        joins(options[:joins]).select(options[:select]).where(options[:conditions])
       end
 
       def find_with_reputation_sql(*args)
-        reputation_name, srn, find_scope, options = parse_query_args(*args)
+        reputation_name, srn, options = parse_query_args(*args)
         options[:select] = build_select_statement(table_name, reputation_name, options[:select])
         options[:joins] = build_join_statement(table_name, name, srn, options[:joins])
         options[:conditions] = build_condition_statement(reputation_name, options[:conditions])
@@ -56,7 +56,7 @@ module FinderMethods
         elsif respond_to?(:construct_finder_arel, true)
           construct_finder_arel(options).to_sql
         else
-          joins(options[:joins]).select(options[:select]).where(options[:conditions]).send(find_scope).to_sql
+          joins(options[:joins]).select(options[:select]).where(options[:conditions]).to_sql
         end
       end
 
@@ -64,22 +64,19 @@ module FinderMethods
 
         def parse_query_args(*args)
           case args.length
-          when 2
-            find_scope = args[1]
+          when 1
             options = {}
+          when 2
+            options = args[1]
           when 3
-            find_scope = args[1]
-            options = args[2]
-          when 4
             scope = args[1]
-            find_scope = args[2]
-            options = args[3]
+            options = args[2]
           else
-            raise ArgumentError, "Expecting 2, 3 or 4 arguments but got #{args.length}"
+            raise ArgumentError, "Expecting 1, 2 or 3 arguments but got #{args.length}"
           end
           reputation_name = args[0]
           srn = ReputationSystem::Network.get_scoped_reputation_name(name, reputation_name, scope)
-          [reputation_name, srn, find_scope, options]
+          [reputation_name, srn, options]
         end
     end
   end
