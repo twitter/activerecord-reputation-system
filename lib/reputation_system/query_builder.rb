@@ -23,7 +23,7 @@ module ReputationSystem
     module ClassMethods
       DELTA = 0.000001
       REPUTATION_JOIN_STATEMENT = "LEFT JOIN rs_reputations ON %s.id = rs_reputations.target_id AND rs_reputations.target_type = ? AND rs_reputations.reputation_name = ? AND rs_reputations.active = ?"
-      REPUTATION_FIELD_STRING = "COALESCE(rs_reputations.value, 0)" 
+      REPUTATION_FIELD_STRING = "COALESCE(rs_reputations.value, 0)"
 
       def build_select_statement(table_name, reputation_name, select=nil, srn=nil, normalize=false)
         select = sanitize_sql_array(["%s.*", table_name]) unless select
@@ -54,11 +54,11 @@ module ReputationSystem
       end
 
       def build_join_statement(table_name, class_name, srn, joins=nil)
-          joins ||= []
-          joins = [joins] unless joins.is_a? Array
-          rep_join = sanitize_sql_array([REPUTATION_JOIN_STATEMENT, class_name.to_s, srn.to_s, true])
-          rep_join = sanitize_sql_array([rep_join, table_name])
-          joins << rep_join
+        joins ||= []
+        joins = [joins] unless joins.is_a? Array
+        rep_join = sanitize_sql_array([REPUTATION_JOIN_STATEMENT, class_name.to_s, srn.to_s, true])
+        rep_join = sanitize_sql_array([rep_join, table_name])
+        joins << rep_join
       end
 
       protected
