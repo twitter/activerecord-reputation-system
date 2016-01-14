@@ -41,7 +41,7 @@ describe ReputationSystem::FinderMethods do
         res = Question.find_with_reputation(:total_votes, :all, {:select => "questions.id"})
         expect(res).to eq([@question])
         expect(res[0].id).not_to be_nil
-        expect {res[0].text}.to raise_error
+        expect(res[0].attributes).not_to include(:text)
       end
 
       it "should retain conditions option" do
@@ -130,7 +130,7 @@ describe ReputationSystem::FinderMethods do
         res = Question.find_with_normalized_reputation(:total_votes, :all, {:select => "questions.id"})
         expect(res).to eq([@question])
         expect(res[0].id).not_to be_nil
-        expect {res[0].text}.to raise_error
+        expect(res[0].attributes).not_to include(:text)
       end
 
       it "should retain conditions option" do

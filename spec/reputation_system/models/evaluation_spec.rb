@@ -28,7 +28,7 @@ describe ReputationSystem::Evaluation do
     end
     it "should not be able to create an evaluation from given source if it has already evaluated the same reputation of the target" do
       ReputationSystem::Evaluation.create!(@attributes)
-      expect {ReputationSystem::Evaluation.create!(@attributes)}.to raise_error
+      expect {ReputationSystem::Evaluation.create!(@attributes)}.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 

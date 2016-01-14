@@ -44,7 +44,7 @@ ActiveRecord::Schema.define do
     t.references  :target, :polymorphic => true
     t.float       :value, :default => 0
     t.text        :data
-    t.timestamps
+    t.timestamps  :null => false
   end
 
   add_index :rs_evaluations, :reputation_name
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define do
     t.references  :target, :polymorphic => true
     t.boolean     :active, :default => true
     t.text        :data
-    t.timestamps
+    t.timestamps  :null => false
   end
 
   add_index :rs_reputations, :reputation_name
@@ -68,53 +68,45 @@ ActiveRecord::Schema.define do
     t.references  :sender, :polymorphic => true
     t.integer     :receiver_id
     t.float       :weight, :default => 1
-    t.timestamps
-  end
+    t.timestamps  :null => false  end
 
   add_index :rs_reputation_messages, [:sender_id, :sender_type]
   add_index :rs_reputation_messages, :receiver_id
 
   create_table :users do |t|
     t.string :name
-    t.timestamps
-  end
+    t.timestamps  :null => false  end
 
   create_table :answers do |t|
     t.integer :author_id
     t.integer :question_id
     t.string :text
-    t.timestamps
-  end
+    t.timestamps  :null => false  end
 
   create_table :questions do |t|
     t.integer :author_id
     t.string :text
-    t.timestamps
-  end
+    t.timestamps  :null => false  end
 
   create_table :phrases do |t|
     t.string :text
-    t.timestamps
-  end
+    t.timestamps  :null => false  end
 
   create_table :translations do |t|
     t.integer :user_id
     t.integer :phrase_id
     t.string  :text
     t.string  :locale
-    t.timestamps
-  end
+    t.timestamps  :null => false  end
 
   create_table :people do |t|
     t.string :name
     t.string :type
-    t.timestamps
-  end
+    t.timestamps  :null => false  end
 
   create_table :posts do |t|
     t.string :name
-    t.timestamps
-  end
+    t.timestamps  :null => false  end
 end
 
 class User < ActiveRecord::Base

@@ -56,7 +56,7 @@ describe ReputationSystem::QueryMethods do
         res = Question.with_reputation(:total_votes).select("questions.id")
         expect(res).to eq([@question])
         expect(res[0].id).not_to be_nil
-        expect {res[0].text}.not_to raise_error
+        expect(res[0].attributes).not_to include(:text)
       end
     end
 
@@ -107,7 +107,7 @@ describe ReputationSystem::QueryMethods do
         res = Question.with_reputation_only(:total_votes).select("questions.id")
         expect(res).to eq([@question])
         expect(res[0].id).not_to be_nil
-        expect {res[0].text}.to raise_error
+        expect(res[0].attributes).not_to include(:text)
       end
     end
 
@@ -146,7 +146,7 @@ describe ReputationSystem::QueryMethods do
         res = Question.with_normalized_reputation(:total_votes).select("questions.id")
         expect(res).to eq([@question])
         expect(res[0].id).not_to be_nil
-        expect {res[0].text}.not_to raise_error
+        expect(res[0].attributes).not_to include(:text)
       end
 
       it "should retain conditions option" do
@@ -200,7 +200,7 @@ describe ReputationSystem::QueryMethods do
         res = Question.with_normalized_reputation_only(:total_votes).select("questions.id")
         expect(res.length).to eq(1)
         expect(res[0].id).not_to be_nil
-        expect {res[0].text}.to raise_error
+        expect(res[0].attributes).not_to include(:text)
       end
 
       it "should retain conditions option" do
